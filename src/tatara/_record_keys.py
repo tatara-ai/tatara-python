@@ -1,0 +1,23 @@
+# Bump this on any log format change. i.e. changing/adding keys or value types
+LOG_FORMAT_VERSION = 1
+
+LOG_RECORD_KEY_EVENT = "event"
+LOG_RECORD_KEY_HAS_RATING="has_rating"
+LOG_RECORD_KEY_ID = "id"
+LOG_RECORD_KEY_INTERNAL_ID = "internal_id"
+LOG_RECORD_KEY_METADATA = "metadata"
+LOG_RECORD_KEY_PARENT_ID = "parent_id"
+LOG_RECORD_KEY_PARENT_TRACE_ID = "parent_trace_id"
+LOG_RECORD_KEY_PROJECT = "project"
+LOG_RECORD_KEY_PROPERTIES = "properties"
+LOG_RECORD_KEY_RATING = "rating"
+LOG_RECORD_KEY_SPANS = "spans"
+LOG_RECORD_KEY_TIMESTAMP = "timestamp"
+LOG_RECORD_KEY_TYPE = "type"
+LOG_RECORD_KEY_USER_ID = "user_id"
+LOG_RECORD_KEY_VERSION = "version"
+
+LOG_RECORD_PROPERTIES_KEY_START_TIME = "start_time"
+LOG_RECORD_PROPERTIES_KEY_END_TIME = "end_time"
+LOG_RECORD_PROPERTIES_KEY_LLM_EVENT = "llm_event"
+LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT = "diffusion_event"
