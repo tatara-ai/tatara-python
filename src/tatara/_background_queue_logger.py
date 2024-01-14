@@ -6,7 +6,7 @@ import threading
 import traceback
 from dataclasses import asdict, is_dataclass
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from ._network_logger import NetworkLogger
 from ._record_keys import (
@@ -100,9 +100,7 @@ def _merge_logs_and_convert_to_json(logs: List[Dict]) -> List[str]:
 # queue logs and periodically send over the wire
 class BackgroundLazyQueueLogger:
     def __init__(
-        self,
-        queue_size: int,
-        flush_interval: float,
+        self, queue_size: int, flush_interval: float, api_key: Optional[str] = None
     ):
         self._flush_lock = threading.RLock()
         self._start_thread_lock = threading.RLock()
@@ -111,7 +109,7 @@ class BackgroundLazyQueueLogger:
         self._thread = None
         self._timer = None
         self._queue_full = threading.Semaphore(value=0)
-        self._network_logger = NetworkLogger()
+        self._network_logger = NetworkLogger(api_key=api_key)
 
         atexit.register(
             lambda: (print("Flushing remaining Tatara logs..."), self._flush())

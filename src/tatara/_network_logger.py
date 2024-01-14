@@ -1,11 +1,21 @@
 import urllib3
 from urllib3.util.retry import Retry
+from typing import Optional
+import os
 
 TATARA_API_ENDPOINT = "https://evals-fastapi.onrender.com/log/write"
 
 
 class NetworkLogger:
-    def __init__(self, endpoint_url: str = TATARA_API_ENDPOINT):
+    def __init__(
+        self, api_key: Optional[str] = None, endpoint_url: str = TATARA_API_ENDPOINT
+    ):
+        if api_key is None:
+            api_key = os.getenv("TATARA_API_KEY")
+
+        if api_key is None:
+            raise Exception("TATARA_API_KEY not set")
+
         retry_strategy = Retry(
             total=3,
             backoff_factor=2,
@@ -13,7 +23,8 @@ class NetworkLogger:
             allowed_methods=["POST"],
         )
         self._http = urllib3.PoolManager(
-            headers={"Content-Type": "application/json"}, retries=retry_strategy
+            headers={"Authorization": api_key, "Content-Type": "application/json"},
+            retries=retry_strategy,
         )
         self._endpoint_url = endpoint_url
 

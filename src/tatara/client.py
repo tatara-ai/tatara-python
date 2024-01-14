@@ -7,22 +7,11 @@ from dataclasses import dataclass
 from enum import Enum
 from inspect import iscoroutinefunction
 from typing import Any, Dict, List, Optional
-
 import wrapt
+import logging
 from openai.types import CompletionUsage
-
-from ._background_queue_logger import BackgroundLazyQueueLogger
-
-
-class ProviderEnum(Enum):
-    ANTHROPIC = "anthropic"
-    ANYSCALE = "anyscale"
-    FIREWORKS = "fireworks"
-    HUGGING_FACE = "huggingface"
-    OPENAI = "openai"
-    STABILITYAI = "stabilityai"
-    TOGETHERAI = "togetherai"
-    OTHER = "other"
+from src.tatara._background_queue_logger import BackgroundLazyQueueLogger
+from src.tatara.provider_enum import ProviderEnum
 
 
 class ImageFormat(Enum):
@@ -211,10 +200,10 @@ DEFAULT_FLUSH_INTERVAL = 60.0
 
 
 def init(
-    api_key: str,
     project: str,
     queue_size: int = DEFAULT_QUEUE_SIZE,
     flush_interval: float = DEFAULT_FLUSH_INTERVAL,
+    api_key: Optional[str] = None,
 ):
     """
     Initialize the global tracer with the provided API key and project event.
@@ -235,6 +224,9 @@ def current_trace() -> Trace:
     current_trace = _logger.current_trace.get()
 
     if current_trace is None:
+        logging.log(
+            logging.WARN, "No current trace found. Did you forget to start the trace?"
+        )
         return _EmptyTrace()
 
     return current_trace
@@ -247,6 +239,9 @@ def current_span() -> Span:
     current_span = _logger.current_span.get()
 
     if current_span is None:
+        logging.log(
+            logging.WARN, "No current span found. Did you forget to start the span?"
+        )
         return _EmptySpan()
 
     return current_span
@@ -450,7 +445,7 @@ def _create_span_decorator(event: Optional[str], parent_event: Optional[str] = N
 
 
 ####################################################################
-## IMPLEMENTATION BELOW                                           ##
+## INTERNALS BELOW                                                ##
 ####################################################################
 
 from ._record_keys import (  # noqa: E402
@@ -916,14 +911,18 @@ class _Logger:
     current_span: contextvars.ContextVar[Optional[Span]]
 
     def __init__(
-        self, api_key: str, project: str, queue_size: int, flush_interval: float
+        self,
+        project: str,
+        queue_size: int,
+        flush_interval: float,
+        api_key: Optional[str] = None,
     ):
         self._api_key = api_key
         self.project = project
         self.current_trace = contextvars.ContextVar("current_trace", default=None)
         self.current_span = contextvars.ContextVar("current_span", default=None)
         self.bglq_logger = BackgroundLazyQueueLogger(
-            queue_size, flush_interval=flush_interval
+            queue_size, flush_interval=flush_interval, api_key=api_key
         )
 
     def create_trace(

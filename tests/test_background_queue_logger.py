@@ -1,7 +1,7 @@
 import time
 from unittest.mock import patch
 
-from tatara._background_queue_logger import (
+from src.tatara._background_queue_logger import (
     BackgroundLazyQueueLogger,
 )
 
@@ -38,7 +38,7 @@ def test_log_method(mock_start):
     assert logger._log_queue.get() == test_log
 
 
-@patch("tatara._background_queue_logger.NetworkLogger.send_logs_post_request")
+@patch("src.tatara._background_queue_logger.NetworkLogger.send_logs_post_request")
 def test_sends_logs_when_queue_is_full(mock_send_logs):
     max_queue_size = 5
     logger = _get_logger(max_queue_size=max_queue_size)
@@ -55,7 +55,7 @@ def test_sends_logs_when_queue_is_full(mock_send_logs):
     mock_send_logs.assert_called()
 
 
-@patch("tatara._background_queue_logger.NetworkLogger.send_logs_post_request")
+@patch("src.tatara._background_queue_logger.NetworkLogger.send_logs_post_request")
 def test_sends_logs_when_timer_fires(mock_send_logs):
     max_queue_size = 5
     logger = _get_logger(max_queue_size=max_queue_size, flush_interval=1)
@@ -65,10 +65,10 @@ def test_sends_logs_when_timer_fires(mock_send_logs):
     mock_send_logs.assert_not_called()
 
     time.sleep(1.5)
-    assert logger._network_logger.send_logs_post_request.called
+    logger._network_logger.send_logs_post_request.assert_called()
 
 
-@patch("tatara._background_queue_logger.NetworkLogger.send_logs_post_request")
+@patch("src.tatara._background_queue_logger.NetworkLogger.send_logs_post_request")
 def test_noop_when_timer_fires_on_empty_queue(mock_send_logs):
     logger = _get_logger(flush_interval=1)
     logger._start()
