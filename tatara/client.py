@@ -10,8 +10,8 @@ from typing import Any, Dict, List, Optional
 import wrapt
 import logging
 from openai.types import CompletionUsage
-from src.tatara._background_queue_logger import BackgroundLazyQueueLogger
-from src.tatara.provider_enum import ProviderEnum
+from tatara._background_queue_logger import BackgroundLazyQueueLogger
+from tatara.provider_enum import ProviderEnum
 
 
 class ImageFormat(Enum):

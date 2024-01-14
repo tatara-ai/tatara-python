@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.tatara.client import log_span, log_trace
+from tatara.client import log_span, log_trace
 
 
 @log_trace(event="sync_event")
@@ -15,13 +15,13 @@ async def async_trace_function(x, y):
     return x * y
 
 
-@patch("src.tatara.client.start_trace")
+@patch("tatara.client.start_trace")
 def test_log_trace_sync(mock_start_trace):
     sync_trace_function(2, 3)
     mock_start_trace.assert_called_once_with(event="sync_event", id_=None, user_id=None)
 
 
-@patch("src.tatara.client.start_trace")
+@patch("tatara.client.start_trace")
 def test_log_trace_sync_with_id(mock_start_trace):
     sync_trace_function(2, 3, trace_id="test_id")  # type: ignore
     mock_start_trace.assert_called_once_with(
@@ -29,7 +29,7 @@ def test_log_trace_sync_with_id(mock_start_trace):
     )
 
 
-@patch("src.tatara.client.start_trace")
+@patch("tatara.client.start_trace")
 def test_log_trace_sync_with_user_id(mock_start_trace):
     sync_trace_function(2, 3, tatara_user_id="test_user_id")  # type: ignore
     mock_start_trace.assert_called_once_with(
@@ -37,7 +37,7 @@ def test_log_trace_sync_with_user_id(mock_start_trace):
     )
 
 
-@patch("src.tatara.client.start_trace")
+@patch("tatara.client.start_trace")
 def test_log_trace_sync_with_id_and_user_id(mock_start_trace):
     sync_trace_function(2, 3, trace_id="test_id", tatara_user_id="test_user_id")  # type: ignore
     mock_start_trace.assert_called_once_with(
@@ -55,7 +55,7 @@ def test_log_trace_fails_without_event():
         f(2, 3)
 
 
-@patch("src.tatara.client.start_trace")
+@patch("tatara.client.start_trace")
 @pytest.mark.asyncio
 async def test_log_trace_async(mock_start_trace):
     await async_trace_function(2, 3)
@@ -74,13 +74,13 @@ async def async_span_function(x, y):
     return x * y
 
 
-@patch("src.tatara.client.start_span")
+@patch("tatara.client.start_span")
 def test_log_span_sync(mock_start_span):
     sync_span_function(2, 3)
     mock_start_span.assert_called_once_with("sync_event", None)
 
 
-@patch("src.tatara.client.start_span")
+@patch("tatara.client.start_span")
 def test_log_span_sync_with_parent_event(mock_start_span):
     @log_span(event="sync_event", parent_event="parent_event")
     def f(x, y):
@@ -100,7 +100,7 @@ def test_log_span_fails_without_event():
         f(2, 3)
 
 
-@patch("src.tatara.client.start_span")
+@patch("tatara.client.start_span")
 def test_log_span_with_caller_event(mock_start_span):
     @log_span  # type: ignore
     def f(x, y):
@@ -110,7 +110,7 @@ def test_log_span_with_caller_event(mock_start_span):
     mock_start_span.assert_called_once_with("caller_event", None)
 
 
-@patch("src.tatara.client.start_span")
+@patch("tatara.client.start_span")
 def test_log_span_with_caller_event_and_parent(mock_start_span):
     @log_span  # type: ignore
     def f(x, y):
@@ -120,7 +120,7 @@ def test_log_span_with_caller_event_and_parent(mock_start_span):
     mock_start_span.assert_called_once_with("caller_event", "caller_parent_event")
 
 
-@patch("src.tatara.client.start_span")
+@patch("tatara.client.start_span")
 @pytest.mark.asyncio
 async def test_async(mock_start_span):
     await async_span_function(2, 3)
