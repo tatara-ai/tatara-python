@@ -7,11 +7,11 @@ on:
   push:
     branches: ["main"]
     paths:
-      - "tatara/src/**"
+      - "src/**"
   pull_request:
     branches: ["main"]
     paths:
-      - "tatara/src/**"
+      - "src/**"
 
 permissions:
   contents: read
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./tatara/src
+        working-directory: ./src
 
     steps:
       - uses: actions/checkout@v4
