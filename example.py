@@ -5,10 +5,10 @@ import uuid
 import os
 
 # set your api key as an environment variable at TATARA_API_KEY
-os.environ["TATARA_API_KEY"] = "<your_api_key_here>"
+os.environ["TATARA_API_KEY"] = "<your api key here>"
 
 # pick a name for your project
-project_name = "<your_project_name_here>"
+project_name = "<your project name here>"
 
 # initialize the client. By default, logs flush every 60 seconds to the server or hits the max queue size (200 for SW, 1000 by default).
 # Here, we set the queue size to 1 and the flush interval to 1 second so we can see the logs immediately.
