@@ -6,11 +6,11 @@ authors = ["Tatara <support@tatara.ai>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=^3.8"
+python = ">=3.8"
 # peg urrlib3 version to this range to avoid conflict with awscli
 urllib3 = ">=1.25.4,<2.1" 
 wrapt = "^1.16.0"
-openai = ">=^1.0.0"
+openai = ">=1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
