@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from tatara.client import log_span, log_trace
+from tatara.logging.logger import log_span, log_trace
 
 
 @log_trace(event="sync_event")

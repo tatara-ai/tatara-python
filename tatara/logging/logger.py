@@ -9,8 +9,7 @@ from inspect import iscoroutinefunction
 from typing import Any, Dict, List, Optional
 import wrapt
 import logging
-from openai.types import CompletionUsage
-from tatara._background_queue_logger import BackgroundLazyQueueLogger
+from tatara.logging._background_queue_logger import BackgroundLazyQueueLogger
 from tatara.provider_enum import ProviderEnum
 
 
@@ -23,13 +22,6 @@ class ImageFormat(Enum):
 class LLMUsageMetrics:
     prompt_tokens: int
     completion_tokens: int
-
-    @classmethod
-    def from_oai_completion_usage(cls, completion_usage: CompletionUsage):
-        return cls(
-            prompt_tokens=completion_usage.prompt_tokens,
-            completion_tokens=completion_usage.completion_tokens,
-        )
 
 
 @dataclass
@@ -209,6 +201,7 @@ def init(
     Initialize the global tracer with the provided API key and project event.
     """
     global _logger
+    global tatara_network_client
     _logger = _Logger(
         api_key=api_key,
         project=project,
@@ -482,6 +475,7 @@ class LogType(Enum):
     TRACE = 0
     SPAN = 1
     RATING = 2
+    EVAL = 3
 
 
 class _SpanImpl(Span):
