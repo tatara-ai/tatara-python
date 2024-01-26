@@ -8,7 +8,7 @@ from dataclasses import asdict, is_dataclass
 from enum import Enum
 from typing import Dict, List, Optional
 
-from ._network_logger import NetworkLogger
+from network._tatara_network_client import TataraNetworkClient
 from ._record_keys import (
     LOG_RECORD_KEY_ID,
     LOG_RECORD_KEY_METADATA,
@@ -109,7 +109,7 @@ class BackgroundLazyQueueLogger:
         self._thread = None
         self._timer = None
         self._queue_full = threading.Semaphore(value=0)
-        self._network_logger = NetworkLogger(api_key=api_key)
+        self._tatara_network_client = TataraNetworkClient(api_key=api_key)
 
         atexit.register(
             lambda: (print("Flushing remaining Tatara logs..."), self._flush())
@@ -177,7 +177,7 @@ class BackgroundLazyQueueLogger:
 
                 # Replace last comma with a closing bracket for valid JSON
                 json_log_str = json_log_str[:-1] + "]"
-                self._network_logger.send_logs_post_request(json_log_str)
+                self._tatara_network_client.send_logs_post_request(json_log_str)
 
     def log(self, log_dict: Dict):
         self._start()
