@@ -16,6 +16,7 @@ pyright = "^1.1.345"
 pytest = "^7.4.4"
 ruff = "^0.1.13"
 twine = "^4.0.2"
+pytest-asyncio = "^0.23.3"
 
 [build-system]
 requires = ["poetry-core"]
