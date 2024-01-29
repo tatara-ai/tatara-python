@@ -27,7 +27,7 @@ from tatara_logging._record_keys import (
     LOG_RECORD_KEY_USER_ID,
 )
 
-from client_state import get_client_state
+from tatara.client import _get_client_state
 
 
 class _TraceImpl(Trace):
@@ -50,7 +50,7 @@ class _TraceImpl(Trace):
         self._end_time = None
         self._span_ids = []
         self._metadata = {}
-        self._token = get_client_state().current_trace.set(self)
+        self._token = _get_client_state().current_trace.set(self)
 
         self._properties = {
             LOG_RECORD_PROPERTIES_KEY_START_TIME: self._start_time,
@@ -58,7 +58,7 @@ class _TraceImpl(Trace):
         }
 
         self._log_record = {
-            LOG_RECORD_KEY_PROJECT: get_client_state().project,
+            LOG_RECORD_KEY_PROJECT: _get_client_state().project,
             LOG_RECORD_KEY_TYPE: LogType.TRACE,
             LOG_RECORD_KEY_TIMESTAMP: now,
             LOG_RECORD_KEY_VERSION: LOG_FORMAT_VERSION,
@@ -117,7 +117,7 @@ class _TraceImpl(Trace):
             id_=span_id,
             parent_id=parent_id,
             trace=self,
-            background_queue_logger=get_client_state().bglq_logger,
+            background_queue_logger=_get_client_state().bglq_logger,
             start_time=time.time(),
         )
 
@@ -125,7 +125,7 @@ class _TraceImpl(Trace):
         self._check_finished()
 
         self._end_time = end_time or time.time()
-        get_client_state().current_trace.reset(self._token)
+        _get_client_state().current_trace.reset(self._token)
 
         self._log_record[LOG_RECORD_KEY_PROPERTIES][
             LOG_RECORD_PROPERTIES_KEY_END_TIME
@@ -141,7 +141,7 @@ class _TraceImpl(Trace):
 
     # we can log a rating after a trace is finished
     def log_rating(self, rating: Rating):
-        return get_client_state().log_rating(
+        return _get_client_state().log_rating(
             rating=rating, trace_id=self.id, span_event=None
         )
 

@@ -1,5 +1,4 @@
 from typing import Optional
-import os
 import time
 import contextvars
 from tatara_logging.utils import _gen_id_from_trace_and_event
@@ -21,38 +20,8 @@ from tatara_logging.rating import Rating
 from tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
 from network._tatara_network_client import TataraNetworkClient
 
-_tatara_client_state = None
-
 DEFAULT_QUEUE_SIZE = 1000
 DEFAULT_FLUSH_INTERVAL = 60.0
-
-
-def get_network_client() -> TataraNetworkClient:
-    if _tatara_client_state is None:
-        raise Exception(
-            "Tatara Client State not initialized. Please call init() before using the client."
-        )
-    return _tatara_client_state.tatara_network_client
-
-
-def tatara_init(project: str):
-    api_key = None
-    if os.environ.get("TATARA_API_KEY") is not None:
-        api_key = os.environ.get("TATARA_API_KEY")
-    else:
-        raise ValueError("TATARA_API_KEY environment variable must be set.")
-
-    queue_size = DEFAULT_QUEUE_SIZE
-    flush_interval = DEFAULT_FLUSH_INTERVAL
-
-    global _tatara_client_state
-    _tatara_client_state = TataraClientState(
-        project,
-        api_key,
-        logger=BackgroundLazyQueueLogger(
-            queue_size=queue_size, flush_interval=flush_interval, api_key=api_key
-        ),
-    )
 
 
 class TataraClientState:
@@ -63,12 +32,10 @@ class TataraClientState:
         self,
         project: str,
         api_key: Optional[str],
-        logger: Optional[BackgroundLazyQueueLogger],
         is_dev: bool = False,
         queue_size: int = DEFAULT_QUEUE_SIZE,
         flush_interval: float = DEFAULT_FLUSH_INTERVAL,
     ):
-        self.logger = logger
         self.project = project
         self.api_key = api_key
         self.is_dev = is_dev
@@ -113,11 +80,3 @@ class TataraClientState:
                     LOG_RECORD_KEY_HAS_RATING: 1,
                 }
             )
-
-
-def get_client_state() -> TataraClientState:
-    if _tatara_client_state is None:
-        raise Exception(
-            "Tatara Client State not initialized. Please call init() before using the client."
-        )
-    return _tatara_client_state
