@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 
 from tatara.client import log_span, log_trace
-import sys
 
 
 @log_trace(event="sync_event")

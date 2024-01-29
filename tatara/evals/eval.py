@@ -3,10 +3,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional
 
-from eval_types import EvalRecord, EvalRow, EvalRun, EvalValue
-from model_package import ModelInputType, ModelOutputType
-from record import Record
-from recorder import RecorderBase
+from evals.eval_types import EvalRecord, EvalRow, EvalRun, EvalValue
+from evals.model_package import ModelInputType, ModelOutputType
+from evals.record import Record
+from evals.recorder import RecorderBase
 
 
 class Eval(ABC):

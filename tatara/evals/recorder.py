@@ -2,7 +2,7 @@ import atexit
 import json
 from abc import ABC, abstractmethod
 
-from eval_types import EvalRun
+from evals.eval_types import EvalRun
 from network._tatara_network_client import TataraNetworkClient
 
 MIN_FLUSH_EVENTS = 100
