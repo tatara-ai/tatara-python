@@ -41,7 +41,7 @@ from tatara_logging._record_keys import (
     LOG_RECORD_KEY_METADATA,
 )
 
-from client_state import get_client_state
+from tatara.client import _get_client_state
 
 
 class _SpanImpl(Span):
@@ -69,12 +69,12 @@ class _SpanImpl(Span):
             LOG_RECORD_PROPERTIES_KEY_START_TIME: self._start_time,
             LOG_RECORD_PROPERTIES_KEY_END_TIME: None,
         }
-        self._token = get_client_state().current_span.set(self)
+        self._token = _get_client_state().current_span.set(self)
 
         self._metadata = {}
 
         self._log_record = {
-            LOG_RECORD_KEY_PROJECT: get_client_state().project,
+            LOG_RECORD_KEY_PROJECT: _get_client_state().project,
             LOG_RECORD_KEY_TYPE: LogType.SPAN,
             LOG_RECORD_KEY_TIMESTAMP: now,
             LOG_RECORD_KEY_VERSION: LOG_FORMAT_VERSION,
@@ -182,7 +182,7 @@ class _SpanImpl(Span):
         self._log()
 
     def log_rating(self, rating: Rating) -> None:
-        return get_client_state().log_rating(
+        return _get_client_state().log_rating(
             trace_id=self.trace_id, span_event=self.event, rating=rating
         )
 
@@ -195,7 +195,7 @@ class _SpanImpl(Span):
 
     def end(self, end_time: Optional[float] = None) -> None:
         self._check_finished()
-        get_client_state().current_span.reset(self._token)
+        _get_client_state().current_span.reset(self._token)
 
         self._end_time = end_time or time.time()
 

@@ -4,7 +4,7 @@ from evals.id_generator import IdGenerator
 from dataclasses import dataclass
 from requests.models import Response
 from requests.exceptions import HTTPError
-from client_state import get_network_client
+from tatara.client import _get_network_client
 
 
 @dataclass
@@ -45,7 +45,7 @@ class Dataset:
                     f"Record {record} is not valid. must have input and output fields"
                 )
 
-        resp = get_network_client().send_insert_records_post_request(
+        resp = _get_network_client().send_insert_records_post_request(
             dataset_name=self.name, records=records
         )
         if resp and resp.ok:
@@ -55,7 +55,7 @@ class Dataset:
     def attach_records(self, record_ids: List[str]) -> None:
         # attach records to a dataset that already exist
         IdGenerator.validate_record_ids(record_ids)
-        resp = get_network_client().send_attach_records_post_request(
+        resp = _get_network_client().send_attach_records_post_request(
             dataset_name=self.name, record_ids=record_ids
         )
         if resp and resp.ok:
@@ -73,7 +73,7 @@ def init_dataset(name: str) -> Dataset:
     Initialize a dataset. This will create a dataset on the tatara server asynchonously
     and return a new dataset object
     """
-    get_network_client().send_create_dataset_post_request(name)
+    _get_network_client().send_create_dataset_post_request(name)
     return Dataset(name=name, records=[])
 
 
@@ -82,7 +82,9 @@ def get_dataset(name: str) -> Dataset:  # type: ignore
     Get a dataset from the tatara server by name
     """
     try:
-        ds_data_response: Response = get_network_client().send_dataset_get_request(name)
+        ds_data_response: Response = _get_network_client().send_dataset_get_request(
+            name
+        )
         ds_data = ds_data_response.json()
         return Dataset(name=name, records=ds_data["records"])
     except HTTPError as e:

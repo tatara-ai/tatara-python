@@ -19,16 +19,52 @@ from tatara_logging._record_keys import (
     LOG_RECORD_KEY_TYPE,
     LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT,
 )
+import os
 
-from client_state import get_client_state
+from client_state import (
+    TataraClientState,
+)
 from tatara_logging.logging_types import ImageFormat
+from network._tatara_network_client import TataraNetworkClient
+
+_tatara_client_state = None
+
+
+def init(project: str, api_key: Optional[str] = None):
+    if api_key is None:
+        if os.environ.get("TATARA_API_KEY") is not None:
+            api_key = os.environ.get("TATARA_API_KEY")
+        else:
+            raise ValueError("TATARA_API_KEY environment variable must be set.")
+
+    global _tatara_client_state
+    _tatara_client_state = TataraClientState(
+        project,
+        api_key,
+    )
+
+
+def _get_client_state() -> TataraClientState:
+    if _tatara_client_state is None:
+        raise Exception(
+            "Tatara Client State not initialized. Please call init() before using the client."
+        )
+    return _tatara_client_state
+
+
+def _get_network_client() -> TataraNetworkClient:
+    if _tatara_client_state is None:
+        raise Exception(
+            "Tatara Client State not initialized. Please call init() before using the client."
+        )
+    return _tatara_client_state.tatara_network_client
 
 
 def current_trace() -> Trace:
     """
     Get the current trace. If there is no current trace, returns an empty trace.
     """
-    current_trace = get_client_state().current_trace.get()
+    current_trace = _get_client_state().current_trace.get()
 
     if current_trace is None:
         logging.log(
@@ -43,7 +79,7 @@ def current_span() -> Span:
     """
     Get the current trace. If there is no current trace, returns an empty trace.
     """
-    current_span = get_client_state().current_span.get()
+    current_span = _get_client_state().current_span.get()
 
     if current_span is None:
         logging.log(
@@ -69,7 +105,7 @@ def start_trace(
     Create a new trace.
     """
     return _TraceImpl(
-        event, logger=get_client_state().bglq_logger, id_=id_, user_id=user_id
+        event, logger=_get_client_state().bglq_logger, id_=id_, user_id=user_id
     )
 
 
@@ -77,7 +113,7 @@ def start_span(event: str, parent_event: Optional[str] = None) -> Span:
     """
     Create a new span. Automatically finds the current trace and returns an empty span an active trace is not found.
     """
-    current_trace = get_client_state().current_trace.get()
+    current_trace = _get_client_state().current_trace.get()
 
     if current_trace is None:
         return _EmptySpan()
@@ -93,7 +129,7 @@ def log_diffusion_input(
 ):
     log = {
         LOG_RECORD_KEY_ID: _gen_id_from_trace_and_event(trace_id, event),
-        LOG_RECORD_KEY_PROJECT: get_client_state().project,
+        LOG_RECORD_KEY_PROJECT: _get_client_state().project,
         LOG_RECORD_KEY_TYPE: LogType.SPAN,
         LOG_RECORD_KEY_TIMESTAMP: time.time(),
         LOG_RECORD_KEY_PROPERTIES: {
@@ -103,7 +139,7 @@ def log_diffusion_input(
             }
         },
     }
-    return get_client_state().bglq_logger.log(log)
+    return _get_client_state().bglq_logger.log(log)
 
 
 def log_diffusion_output_with_image_data(
@@ -115,7 +151,7 @@ def log_diffusion_output_with_image_data(
 def log_diffusion_output_with_image_url(image_url: str, trace_id: str, event: str):
     log = {
         LOG_RECORD_KEY_ID: _gen_id_from_trace_and_event(trace_id, event),
-        LOG_RECORD_KEY_PROJECT: get_client_state().project,
+        LOG_RECORD_KEY_PROJECT: _get_client_state().project,
         LOG_RECORD_KEY_TYPE: LogType.SPAN,
         LOG_RECORD_KEY_TIMESTAMP: time.time(),
         LOG_RECORD_KEY_PROPERTIES: {
@@ -124,7 +160,7 @@ def log_diffusion_output_with_image_url(image_url: str, trace_id: str, event: st
             }
         },
     }
-    return get_client_state().bglq_logger.log(log)
+    return _get_client_state().bglq_logger.log(log)
 
 
 def log_diffusion_call_with_image_data(
@@ -152,7 +188,7 @@ def log_rating_for_span(span_event: str, trace_id: str, rating: Rating):
     """
     Add a rating for a span.
     """
-    get_client_state().log_rating(
+    _get_client_state().log_rating(
         rating=rating, trace_id=trace_id, span_event=span_event
     )
 
@@ -161,7 +197,7 @@ def log_rating_for_trace(id: str, rating: Rating):
     """
     Add a rating for a trace. ID can be either the user-provided id or the trace_id.
     """
-    get_client_state().log_rating(rating=rating, trace_id=id, span_event=None)
+    _get_client_state().log_rating(rating=rating, trace_id=id, span_event=None)
 
 
 def log_trace(event: str):
