@@ -1,0 +1,104 @@
+---
+title: "Logging Quickstart"
+description: "Start logging to Tatara"
+---
+
+### Pre-requisite
+
+Make sure you've followed the setup instructions in the [installation guide](/setup).
+
+## Logging to Tatara
+
+Begin by initializing the client with your project name. The project name tells Tatara which project to log to.
+
+```python
+from tatara import tatara
+
+# By default, logs flush when:
+# * 60 seconds are update
+# * the max queue size is hit (1000 by default)
+# Here, we set the queue size to 1 and the flush interval to 1 second
+# so we can see the logs immediately.
+tatara.init(project="my test project", queue_size=1, flush_interval=1)
+```
+
+Tatara has a concept of a [trace](/concepts#traces), which is a collection of [spans](/concepts#span). A trace is a logical unit of work that can be used to group spans together.
+Because all of our spans are model calls, you can think of a trace as a "chain" of model calls.
+
+Below, we make two calls to OpenAI's API.
+First we create a function that calls OpenAI's API and logs the result to Tatara.
+Then we create a trace and two spans, one for each call to OpenAI's API.
+
+```python
+openai_client = OpenAI()
+model_name = "gpt-3.5-turbo-1106"
+freq_penalty = 0.1
+temperature = 0.1
+max_tokens = 200
+
+
+def openai_completion_with_logging(
+    prompt: str,
+    model_name: str,
+    temperature: float,
+    freq_penalty: float,
+    max_tokens: int,
+):
+    response = openai_client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model=model_name,
+        temperature=temperature,
+        frequency_penalty=freq_penalty,
+        max_tokens=max_tokens,
+    )
+    ret = response.choices[0].message.content
+    if ret is None:
+        raise Exception("OpenAI returned 0 length response")
+
+    # calling current_span will get the span that is currently active
+    # this is useful if we're several calls deep in the stack and want to log something
+    # this way we don't have to pass around the span object
+    tatara_client.current_span().log_llm_success(
+        prompt=prompt,
+        output=ret,
+        params=LLMParams(
+            model=model_name,
+            temperature=temperature,
+            frequency_penalty=freq_penalty,
+            max_tokens=max_tokens,
+            provider=ProviderEnum.OPENAI,
+        ),
+        usage_metrics=LLMUsageMetrics.from_oai_completion_usage(response.usage)
+        if response.usage
+        else None,
+    )
+    return ret
+```
+
+Now we'll create a trace and two spans, one for each call to OpenAI's API.
+
+```python
+trace_name = "poem_and_critique"
+uuid4: str = str(uuid.uuid4())
+
+# I'll specify my own id for the trace via the id_ param so I can search for it in the UI later on.
+# I'll also specify the user_id param, which is _your_ user_id, so you know which of your users is responsible for this interaction.
+with tatara_client.start_trace(event=trace_name, id_=uuid4, user_id="user-123"):
+    with tatara_client.start_span(event="write_poem"):
+        poem_prompt = "Write me a poem in the style of William Carlos Williams"
+        poem = openai_completion_with_logging(
+            poem_prompt, model_name, temperature, freq_penalty, max_tokens
+        )
+    with tatara_client.start_span(event="write_critique"):
+        poem_critique_prompt = (
+            "Write me a critique of this poem in the style of Michiko Kakutani: "
+            + poem_prompt
+        )
+        critique = openai_completion_with_logging(
+            poem_critique_prompt, model_name, temperature, freq_penalty, max_tokens
+        )
+```
+
+## Viewing your logs
+
+Now head over to the [Tatara dashboard](https://app.tatara.ai) to view your logs.

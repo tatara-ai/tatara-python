@@ -1,0 +1,39 @@
+# Getting Started with Tatara
+
+Follow these steps to set up Tatara.
+
+## Prerequisites
+
+Ensure that you have Python's package installer `pip` [installed](https://pip.pypa.io/en/stable/installation/).
+
+## Step 1: Installing the Tatara Python library
+
+Open your terminal and run the following command:
+
+```bash
+pip install tatara
+```
+
+<Tip>
+  {" "}
+  If you're using a `requirements.txt` or `pyproject.toml` file to manage your project's
+  dependencies, we recommend specifying the client version. You can view the current
+  Python client version over at [PyPi](https://pypi.org/project/tatara/).{" "}
+</Tip>
+
+## Step 2: Setting up your API key
+
+<Info>
+  If you don't have an API key, request one by e-mailing us at
+  [support@tatara.ai](mailto:support@tatara.ai)
+</Info>
+
+Once you have your API key, you'll need to set it as an environment variable in your Bash environment. This allows your application to securely authenticate with Tatara's services. Use the following command in your terminal, replacing `<your api key here>` with the API key you received:
+
+```bash
+export TATARA_API_KEY="<your api key here>"
+```
+
+For a permanent solution, you can add this command to your `~/.bash_profile`, `~/.bashrc file`, or `~/.zshrc` (depending on your operating system), ensuring the API key is automatically set whenever you open a new terminal session.
+
+<Check> You're now all set to start using Tatara! </Check>

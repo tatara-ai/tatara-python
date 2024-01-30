@@ -1,9 +1,13 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "Tatara",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
+  },
+  "modeToggle": {
+    "default": "light",
+    "isHidden": true
   },
   "favicon": "/favicon.svg",
   "colors": {
@@ -51,12 +55,9 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["introduction", "quickstart", "development"]
+      "pages": ["introduction", "setup", "quickstarts/logging", "quickstarts/evals"]
     },
-    {
-      "group": "Essentials",
-      "pages": ["essentials/markdown", "essentials/code", "essentials/images", "essentials/settings", "essentials/navigation"]
-    },
+    {"group": "Concepts", "pages": ["concepts/datasets", "concepts/evals", "concepts/logging"]},
     {
       "group": "API Documentation",
       "pages": ["api-reference/introduction"]
@@ -71,8 +72,8 @@
     }
   ],
   "footerSocials": {
-    "twitter": "https://twitter.com/mintlify",
+    "twitter": "https://twitter.com/tatara_ai",
     "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "linkedin": "https://www.linkedin.com/company/tatara-ai"
   }
 }
