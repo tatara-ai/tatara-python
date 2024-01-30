@@ -27,7 +27,7 @@ from tatara_logging._record_keys import (
     LOG_RECORD_KEY_USER_ID,
 )
 
-from tatara.client import _get_client_state
+from tatara.client_state import _get_client_state
 
 
 class _TraceImpl(Trace):

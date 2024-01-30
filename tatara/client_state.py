@@ -23,6 +23,8 @@ from network._tatara_network_client import TataraNetworkClient
 DEFAULT_QUEUE_SIZE = 1000
 DEFAULT_FLUSH_INTERVAL = 60.0
 
+_tatara_client_state = None
+
 
 class TataraClientState:
     current_trace: contextvars.ContextVar[Optional[Trace]]
@@ -80,3 +82,19 @@ class TataraClientState:
                     LOG_RECORD_KEY_HAS_RATING: 1,
                 }
             )
+
+
+def _get_client_state() -> TataraClientState:
+    if _tatara_client_state is None:
+        raise Exception(
+            "Tatara Client State not initialized. Please call init() before using the client."
+        )
+    return _tatara_client_state
+
+
+def _get_network_client() -> TataraNetworkClient:
+    if _tatara_client_state is None:
+        raise Exception(
+            "Tatara Client State not initialized. Please call init() before using the client."
+        )
+    return _tatara_client_state.tatara_network_client
