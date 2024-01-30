@@ -21,13 +21,8 @@ from tatara_logging._record_keys import (
 )
 import os
 
-from client_state import (
-    TataraClientState,
-)
+from client_state import TataraClientState, _get_client_state
 from tatara_logging.logging_types import ImageFormat
-from network._tatara_network_client import TataraNetworkClient
-
-_tatara_client_state = None
 
 
 def init(project: str, api_key: Optional[str] = None):
@@ -42,22 +37,6 @@ def init(project: str, api_key: Optional[str] = None):
         project,
         api_key,
     )
-
-
-def _get_client_state() -> TataraClientState:
-    if _tatara_client_state is None:
-        raise Exception(
-            "Tatara Client State not initialized. Please call init() before using the client."
-        )
-    return _tatara_client_state
-
-
-def _get_network_client() -> TataraNetworkClient:
-    if _tatara_client_state is None:
-        raise Exception(
-            "Tatara Client State not initialized. Please call init() before using the client."
-        )
-    return _tatara_client_state.tatara_network_client
 
 
 def current_trace() -> Trace:

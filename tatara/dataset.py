@@ -4,7 +4,7 @@ from evals.id_generator import IdGenerator
 from dataclasses import dataclass
 from requests.models import Response
 from requests.exceptions import HTTPError
-from tatara.client import _get_network_client
+from client_state import _get_network_client
 
 
 @dataclass
