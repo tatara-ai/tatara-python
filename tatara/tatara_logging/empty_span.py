@@ -1,5 +1,5 @@
 from typing import Any, Dict, Optional
-from tatara_logging.logging_types import (
+from tatara.types import (
     ImageFormat,
     DiffusionParams,
     DiffusionPrompt,

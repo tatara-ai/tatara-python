@@ -1,7 +1,7 @@
 from tatara_logging.span import Span
 from tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
-from tatara_logging.logging_types import ImageFormat
-from tatara_logging.logging_types import (
+from tatara.types import (
+    ImageFormat,
     DiffusionParams,
     DiffusionPrompt,
     LLMPrompt,

@@ -8,7 +8,7 @@ from dataclasses import asdict, is_dataclass
 from enum import Enum
 from typing import Dict, List, Optional
 
-from network._tatara_network_client import TataraNetworkClient
+from tatara.network._tatara_network_client import TataraNetworkClient
 from ._record_keys import (
     LOG_RECORD_KEY_ID,
     LOG_RECORD_KEY_METADATA,
