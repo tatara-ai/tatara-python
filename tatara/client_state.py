@@ -3,7 +3,7 @@ import time
 import contextvars
 from tatara_logging.utils import _gen_id_from_trace_and_event
 
-from tatara.types import LogType
+from tatara_types import LogType
 from tatara_logging._record_keys import (
     LOG_FORMAT_VERSION,
     LOG_RECORD_KEY_HAS_RATING,

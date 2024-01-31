@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
-from tatara.types import (
+from tatara_types import (
     DiffusionParams,
     DiffusionPrompt,
     LLMPrompt,
