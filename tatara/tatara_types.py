@@ -9,6 +9,13 @@ class LLMUsageMetrics:
     prompt_tokens: int
     completion_tokens: int
 
+    @classmethod
+    def from_oai_completion_usage(cls, completion_usage): # openai.types.CompletionUsage
+        return cls(
+            prompt_tokens=completion_usage.prompt_tokens,
+            completion_tokens=completion_usage.completion_tokens,
+        )
+
 
 @dataclass
 class LLMPrompt:
