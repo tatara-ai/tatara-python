@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
-from tatara_logging.logging_types import (
+from tatara.types import (
     DiffusionParams,
     DiffusionPrompt,
     LLMPrompt,
     LLMParams,
     LLMUsageMetrics,
+    ImageFormat,
 )
 from tatara_logging.rating import Rating
-from tatara_logging.logging_types import ImageFormat
 
 
 class Span(ABC):

@@ -9,7 +9,7 @@ from tatara_logging.empty_span import _EmptySpan
 from tatara_logging.empty_trace import _EmptyTrace
 from tatara_logging.trace_impl import _TraceImpl
 from tatara_logging.rating import Rating
-from tatara_logging.logging_types import DiffusionPrompt, DiffusionParams, LogType
+from tatara.types import DiffusionPrompt, DiffusionParams, LogType, ImageFormat
 from tatara_logging.utils import _gen_id_from_trace_and_event
 from tatara_logging._record_keys import (
     LOG_RECORD_KEY_ID,
@@ -22,7 +22,6 @@ from tatara_logging._record_keys import (
 import os
 
 from client_state import TataraClientState, _get_client_state
-from tatara_logging.logging_types import ImageFormat
 
 
 def init(project: str, api_key: Optional[str] = None):
