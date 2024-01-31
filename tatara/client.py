@@ -60,7 +60,6 @@ def init(project: str, is_dev: bool, queue_size: int = DEFAULT_QUEUE_SIZE, flush
         api_key=api_key,
         is_dev=is_dev
     )
-    print(_tatara_client_state, "AFTER INIT", flush=True)
 
 
 def current_trace() -> Trace:
