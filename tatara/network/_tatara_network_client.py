@@ -23,7 +23,7 @@ class TataraNetworkClient:
 
     ### LOGS
     def send_logs_post_request(self, logs: str) -> Optional[Response]:
-        return self.send_post_request(self.endpoints.log_endpoint, logs)
+        return self.send_post_request(f"{self.endpoints.log_endpoint}/write", logs)
 
     ### DATASETS
     def send_create_dataset_post_request(self, dataset_name: str) -> Optional[Response]:

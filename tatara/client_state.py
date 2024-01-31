@@ -1,10 +1,10 @@
 from typing import Optional
 import time
 import contextvars
-from .tatara_logging.utils import _gen_id_from_trace_and_event
+from tatara.tatara_logging.utils import _gen_id_from_trace_and_event
 
 from tatara.tatara_types import LogType
-from .tatara_logging._record_keys import (
+from tatara.tatara_logging._record_keys import (
     LOG_FORMAT_VERSION,
     LOG_RECORD_KEY_HAS_RATING,
     LOG_RECORD_KEY_ID,
@@ -14,17 +14,13 @@ from .tatara_logging._record_keys import (
     LOG_RECORD_KEY_TYPE,
     LOG_RECORD_KEY_VERSION,
 )
-from .tatara_logging.trace import Trace
-from .tatara_logging.span import Span
-from .tatara_logging.rating import Rating
-from .tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
+from tatara.tatara_logging.trace import Trace
+from tatara.tatara_logging.span import Span
+from tatara.tatara_logging.rating import Rating
+from tatara.tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
 from tatara.network._tatara_network_client import TataraNetworkClient
 
-DEFAULT_QUEUE_SIZE = 1000
-DEFAULT_FLUSH_INTERVAL = 60.0
-
 _tatara_client_state = None
-
 
 class TataraClientState:
     current_trace: contextvars.ContextVar[Optional[Trace]]
@@ -33,10 +29,10 @@ class TataraClientState:
     def __init__(
         self,
         project: str,
+        queue_size: int,
+        flush_interval: float,
         api_key: Optional[str],
         is_dev: bool = False,
-        queue_size: int = DEFAULT_QUEUE_SIZE,
-        flush_interval: float = DEFAULT_FLUSH_INTERVAL,
     ):
         self.project = project
         self.api_key = api_key
@@ -48,7 +44,7 @@ class TataraClientState:
             api_key=self.api_key, is_dev=is_dev
         )
         self.bglq_logger = BackgroundLazyQueueLogger(
-            queue_size, flush_interval=flush_interval, api_key=api_key
+            queue_size, flush_interval=flush_interval,             tatara_network_client=self.tatara_network_client, api_key=api_key,
         )
 
     def log_rating(
@@ -84,6 +80,14 @@ class TataraClientState:
             )
 
 
+def _get_network_client() -> TataraNetworkClient:
+    if _get_client_state() is None:
+        raise Exception(
+            "Tatara Client State not initialized. Please call init() before using the client."
+        )
+    return _get_client_state().tatara_network_client
+
+
 def _get_client_state() -> TataraClientState:
     if _tatara_client_state is None:
         raise Exception(
@@ -91,10 +95,6 @@ def _get_client_state() -> TataraClientState:
         )
     return _tatara_client_state
 
-
-def _get_network_client() -> TataraNetworkClient:
-    if _tatara_client_state is None:
-        raise Exception(
-            "Tatara Client State not initialized. Please call init() before using the client."
-        )
-    return _tatara_client_state.tatara_network_client
+def _set_client_state(tatara_client_state: TataraClientState) -> None:
+    global _tatara_client_state
+    _tatara_client_state = tatara_client_state
