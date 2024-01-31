@@ -3,15 +3,15 @@ from inspect import iscoroutinefunction
 from typing import Optional
 import wrapt
 import logging
-from .tatara_logging.trace import Trace
-from .tatara_logging.span import Span
-from .tatara_logging.empty_span import _EmptySpan
-from .tatara_logging.empty_trace import _EmptyTrace
-from .tatara_logging.trace_impl import _TraceImpl
-from .tatara_logging.rating import Rating
-from .tatara_types import DiffusionPrompt, DiffusionParams, LogType, ImageFormat
-from .tatara_logging.utils import _gen_id_from_trace_and_event
-from .tatara_logging._record_keys import (
+from tatara.tatara_logging.trace import Trace
+from tatara.tatara_logging.span import Span
+from tatara.tatara_logging.empty_span import _EmptySpan
+from tatara.tatara_logging.empty_trace import _EmptyTrace
+from tatara.tatara_logging.trace_impl import _TraceImpl
+from tatara.tatara_logging.rating import Rating
+from tatara.tatara_types import DiffusionPrompt, DiffusionParams, LogType, ImageFormat
+from tatara.tatara_logging.utils import _gen_id_from_trace_and_event
+from tatara.tatara_logging._record_keys import (
     LOG_RECORD_KEY_ID,
     LOG_RECORD_KEY_PROJECT,
     LOG_RECORD_KEY_PROPERTIES,
@@ -21,22 +21,29 @@ from .tatara_logging._record_keys import (
 )
 import os
 
-from .client_state import TataraClientState, _get_client_state
+from .client_state import TataraClientState, _set_client_state, _get_client_state
 
 
-def init(project: str, is_dev: bool, api_key: Optional[str] = None):
+DEFAULT_QUEUE_SIZE = 1000
+DEFAULT_FLUSH_INTERVAL = 60.0
+
+
+
+def init(project: str, is_dev: bool, queue_size: int = DEFAULT_QUEUE_SIZE, flush_interval: float = DEFAULT_FLUSH_INTERVAL, api_key: Optional[str] = None):
     if api_key is None:
         if os.environ.get("TATARA_API_KEY") is not None:
             api_key = os.environ.get("TATARA_API_KEY")
         else:
             raise ValueError("TATARA_API_KEY environment variable must be set.")
 
-    global _tatara_client_state
-    _tatara_client_state = TataraClientState(
+    _set_client_state(tatara_client_state=TataraClientState(
         project,
-        api_key,
+        queue_size = queue_size,
+        flush_interval = flush_interval,
+        api_key=api_key,
         is_dev=is_dev
-    )
+    ))
+
 
 
 def current_trace() -> Trace:

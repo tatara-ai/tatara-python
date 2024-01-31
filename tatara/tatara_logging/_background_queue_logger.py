@@ -100,7 +100,7 @@ def _merge_logs_and_convert_to_json(logs: List[Dict]) -> List[str]:
 # queue logs and periodically send over the wire
 class BackgroundLazyQueueLogger:
     def __init__(
-        self, queue_size: int, flush_interval: float, api_key: Optional[str] = None
+        self, queue_size: int, flush_interval: float, tatara_network_client: TataraNetworkClient,api_key: Optional[str] = None
     ):
         self._flush_lock = threading.RLock()
         self._start_thread_lock = threading.RLock()
@@ -109,7 +109,7 @@ class BackgroundLazyQueueLogger:
         self._thread = None
         self._timer = None
         self._queue_full = threading.Semaphore(value=0)
-        self._tatara_network_client = TataraNetworkClient(api_key=api_key)
+        self._tatara_network_client = tatara_network_client
 
         atexit.register(
             lambda: (print("Flushing remaining Tatara logs..."), self._flush())

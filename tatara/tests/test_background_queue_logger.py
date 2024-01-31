@@ -3,11 +3,12 @@ from tatara.tatara_logging._background_queue_logger import (
 )
 from unittest.mock import patch
 import time
-
+from tatara.network._tatara_network_client import TataraNetworkClient
 
 def _get_logger(max_queue_size=5, flush_interval=60):
     return BackgroundLazyQueueLogger(
-        queue_size=max_queue_size, flush_interval=flush_interval
+        queue_size=max_queue_size, flush_interval=flush_interval,
+        tatara_network_client=TataraNetworkClient()
     )
 
 
