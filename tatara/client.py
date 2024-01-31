@@ -45,7 +45,7 @@ DEFAULT_FLUSH_INTERVAL = 60.0
 
 
 
-def init(project: str, is_dev: bool, queue_size: int = DEFAULT_QUEUE_SIZE, flush_interval: float = DEFAULT_FLUSH_INTERVAL, api_key: Optional[str] = None):
+def init(project: str, queue_size: int = DEFAULT_QUEUE_SIZE, flush_interval: float = DEFAULT_FLUSH_INTERVAL, api_key: Optional[str] = None, is_dev: Optional[bool] = False):
     if api_key is None:
         if os.environ.get("TATARA_API_KEY") is not None:
             api_key = os.environ.get("TATARA_API_KEY")
@@ -58,7 +58,7 @@ def init(project: str, is_dev: bool, queue_size: int = DEFAULT_QUEUE_SIZE, flush
         queue_size = queue_size,
         flush_interval = flush_interval,
         api_key=api_key,
-        is_dev=is_dev
+        is_dev=is_dev if is_dev is not None else False,
     )
 
 
