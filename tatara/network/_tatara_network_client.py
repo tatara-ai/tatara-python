@@ -1,9 +1,9 @@
 import requests
 from requests.adapters import HTTPAdapter
-from evals.eval_types import EvalRun
+from tatara.evals.eval_types import EvalRun
 from typing import Optional, Dict, List, Any
 import json
-from network.endpoints import Endpoints
+from .endpoints import Endpoints
 from requests.models import Response
 
 

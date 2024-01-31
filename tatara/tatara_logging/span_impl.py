@@ -1,6 +1,6 @@
-from tatara_logging.span import Span
-from tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
-from tatara_types import (
+from .span import Span
+from ._background_queue_logger import BackgroundLazyQueueLogger
+from tatara.tatara_types import (
     ImageFormat,
     DiffusionParams,
     DiffusionPrompt,
@@ -9,8 +9,8 @@ from tatara_types import (
     LLMUsageMetrics,
     LogType,
 )
-from tatara_logging.rating import Rating
-from tatara_logging.utils import _check_event
+from .rating import Rating
+from .utils import _check_event
 from typing import Optional, Dict, Any
 import uuid
 import time
@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from tatara_logging.trace_impl import _TraceImpl
 
-from tatara_logging._record_keys import (
+from ._record_keys import (
     LOG_FORMAT_VERSION,
     LOG_RECORD_KEY_EVENT,
     LOG_RECORD_KEY_ID,

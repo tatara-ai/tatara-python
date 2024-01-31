@@ -1,10 +1,10 @@
 from typing import Optional
 import time
 import contextvars
-from tatara_logging.utils import _gen_id_from_trace_and_event
+from .tatara_logging.utils import _gen_id_from_trace_and_event
 
-from tatara_types import LogType
-from tatara_logging._record_keys import (
+from tatara.tatara_types import LogType
+from .tatara_logging._record_keys import (
     LOG_FORMAT_VERSION,
     LOG_RECORD_KEY_HAS_RATING,
     LOG_RECORD_KEY_ID,
@@ -14,11 +14,11 @@ from tatara_logging._record_keys import (
     LOG_RECORD_KEY_TYPE,
     LOG_RECORD_KEY_VERSION,
 )
-from tatara_logging.trace import Trace
-from tatara_logging.span import Span
-from tatara_logging.rating import Rating
-from tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
-from network._tatara_network_client import TataraNetworkClient
+from .tatara_logging.trace import Trace
+from .tatara_logging.span import Span
+from .tatara_logging.rating import Rating
+from .tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
+from tatara.network._tatara_network_client import TataraNetworkClient
 
 DEFAULT_QUEUE_SIZE = 1000
 DEFAULT_FLUSH_INTERVAL = 60.0

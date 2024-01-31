@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
-from tatara_types import (
+from tatara.tatara_types import (
     DiffusionParams,
     DiffusionPrompt,
     LLMPrompt,
@@ -9,7 +9,7 @@ from tatara_types import (
     LLMUsageMetrics,
     ImageFormat,
 )
-from tatara_logging.rating import Rating
+from .rating import Rating
 
 
 class Span(ABC):

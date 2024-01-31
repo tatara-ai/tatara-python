@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from tatara_logging.rating import Rating
+from .rating import Rating
 from typing import Any, Dict, List, Optional
-from tatara_logging.span import Span
+from .span import Span
 
 
 class Trace(ABC):

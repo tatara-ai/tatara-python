@@ -1,16 +1,16 @@
-from tatara_logging.trace import Trace
-from tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
-from tatara_types import (
+from .trace import Trace
+from ._background_queue_logger import BackgroundLazyQueueLogger
+from tatara.tatara_types import (
     LogType,
 )
-from tatara_logging.span_impl import _SpanImpl
-from tatara_logging.rating import Rating
-from tatara_logging.utils import _check_event
+from .span_impl import _SpanImpl
+from .rating import Rating
+from .utils import _check_event
 from typing import Optional, Dict, Any, List
 import uuid
 import time
 
-from tatara_logging._record_keys import (
+from ._record_keys import (
     LOG_FORMAT_VERSION,
     LOG_RECORD_KEY_EVENT,
     LOG_RECORD_KEY_ID,

@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Optional
-from tatara_logging.trace import Trace
-from tatara_logging.span import Span
-from tatara_logging.rating import Rating
-from tatara_logging.empty_span import _EmptySpan
+from .trace import Trace
+from .span import Span
+from .rating import Rating
+from .empty_span import _EmptySpan
 
 
 class _EmptyTrace(Trace):
