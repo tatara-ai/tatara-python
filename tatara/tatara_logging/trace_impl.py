@@ -1,6 +1,6 @@
 from tatara_logging.trace import Trace
 from tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
-from tatara.types import (
+from tatara_types import (
     LogType,
 )
 from tatara_logging.span_impl import _SpanImpl

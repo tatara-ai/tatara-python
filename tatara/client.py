@@ -3,13 +3,13 @@ from inspect import iscoroutinefunction
 from typing import Optional
 import wrapt
 import logging
-from tatara_logging.trace import Trace
+from tatara.tatara_logging.trace import Trace
 from tatara_logging.span import Span
 from tatara_logging.empty_span import _EmptySpan
 from tatara_logging.empty_trace import _EmptyTrace
 from tatara_logging.trace_impl import _TraceImpl
 from tatara_logging.rating import Rating
-from tatara.types import DiffusionPrompt, DiffusionParams, LogType, ImageFormat
+from tatara_types import DiffusionPrompt, DiffusionParams, LogType, ImageFormat
 from tatara_logging.utils import _gen_id_from_trace_and_event
 from tatara_logging._record_keys import (
     LOG_RECORD_KEY_ID,

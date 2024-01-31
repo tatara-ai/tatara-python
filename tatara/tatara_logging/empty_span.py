@@ -1,5 +1,5 @@
 from typing import Any, Dict, Optional
-from tatara.types import (
+from tatara_types import (
     ImageFormat,
     DiffusionParams,
     DiffusionPrompt,
