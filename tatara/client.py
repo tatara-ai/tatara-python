@@ -24,7 +24,7 @@ import os
 from .client_state import TataraClientState, _get_client_state
 
 
-def init(project: str, api_key: Optional[str] = None):
+def init(project: str, is_dev: bool, api_key: Optional[str] = None):
     if api_key is None:
         if os.environ.get("TATARA_API_KEY") is not None:
             api_key = os.environ.get("TATARA_API_KEY")
@@ -35,6 +35,7 @@ def init(project: str, api_key: Optional[str] = None):
     _tatara_client_state = TataraClientState(
         project,
         api_key,
+        is_dev=is_dev
     )
 
 
