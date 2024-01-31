@@ -1,5 +1,5 @@
 from typing import Any, Dict, Optional
-from tatara_types import (
+from tatara.tatara_types import (
     ImageFormat,
     DiffusionParams,
     DiffusionPrompt,
@@ -7,8 +7,8 @@ from tatara_types import (
     LLMParams,
     LLMUsageMetrics,
 )
-from tatara_logging.rating import Rating
-from tatara_logging.span import Span
+from .rating import Rating
+from .span import Span
 
 
 class _EmptySpan(Span):

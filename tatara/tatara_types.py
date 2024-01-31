@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional, Dict
-from provider_enum import ProviderEnum
+from .provider_enum import ProviderEnum
 from enum import Enum
 
 

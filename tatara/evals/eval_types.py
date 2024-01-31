@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
-from evals.id_generator import IdGenerator
+from tatara.evals.id_generator import IdGenerator
 
 RecordId = str
 
