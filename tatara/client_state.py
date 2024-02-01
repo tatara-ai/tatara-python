@@ -44,7 +44,8 @@ class TataraClientState:
             api_key=self.api_key, is_dev=is_dev
         )
         self.bglq_logger = BackgroundLazyQueueLogger(
-            queue_size, flush_interval=flush_interval,             tatara_network_client=self.tatara_network_client, api_key=api_key,
+            queue_size, flush_interval=flush_interval,
+            tatara_network_client=self.tatara_network_client, api_key=api_key,
         )
 
     def log_rating(
