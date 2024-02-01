@@ -7,13 +7,20 @@ from evals.eval_types import EvalRecord, EvalRow, EvalRun, EvalValue
 from evals.model_package import ModelInputType, ModelOutputType
 from evals.record import Record
 from evals.recorder import RecorderBase
+from enum import Enum
 
+class EvalResultType(Enum):
+    BOOLEAN = "boolean"
+    INT = "int"
+    FLOAT = "float"
+    CATEGORY = "category"
 
 class Eval(ABC):
     name: str
     description: str
     valid_input_types: List[ModelInputType]
     valid_output_types: List[ModelOutputType]
+    eval_result_type: EvalResultType
 
     def __init__(
         self,
