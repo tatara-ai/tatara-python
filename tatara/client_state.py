@@ -68,11 +68,12 @@ class TataraClientState:
         )
 
         if span_event is not None:
+            # mark that the span's parent trace has a rating
             self.bglq_logger.log(
                 {
                     LOG_RECORD_KEY_PROJECT: self.project,
                     LOG_RECORD_KEY_TYPE: LogType.TRACE,
-                    LOG_RECORD_KEY_ID: id,
+                    LOG_RECORD_KEY_ID: trace_id,
                     LOG_RECORD_KEY_TIMESTAMP: now,
                     LOG_RECORD_KEY_VERSION: LOG_FORMAT_VERSION,
                     LOG_RECORD_KEY_HAS_RATING: 1,
