@@ -13,7 +13,7 @@ class EvalResultType(Enum):
     BOOLEAN = "boolean"
     INT = "int"
     FLOAT = "float"
-    CATEGORY = "category"
+    CATEGORICAL = "categorical"
 
 class Eval(ABC):
     name: str
