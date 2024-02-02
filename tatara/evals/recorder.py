@@ -2,8 +2,8 @@ import atexit
 import json
 from abc import ABC, abstractmethod
 
-from evals.eval_types import EvalRun
-from network._tatara_network_client import TataraNetworkClient
+from tatara.evals.eval_types import EvalRun
+from tatara.network._tatara_network_client import TataraNetworkClient
 
 MIN_FLUSH_EVENTS = 100
 MIN_FLUSH_SECONDS = 10
@@ -15,7 +15,7 @@ class RecorderBase(ABC):
         # flush_events results on exit
         atexit.register(self.flush_events)
 
-    @abstractmethod
+#    @abstractmethod
     def _flush_internal(self, results):
         pass
 
@@ -23,11 +23,11 @@ class RecorderBase(ABC):
     def flush_events(self):
         pass
 
-    @abstractmethod
+#    @abstractmethod
     def record_eval_row(self, eval_row):
         pass
 
-    @abstractmethod
+#    @abstractmethod
     def record_eval_run(self, eval_run):
         pass
 

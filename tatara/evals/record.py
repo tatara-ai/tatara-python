@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from evals.model_package import ModelPackage
+from tatara.evals.model_package import ModelPackage
 
 
 @dataclass
