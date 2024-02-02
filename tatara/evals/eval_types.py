@@ -1,16 +1,17 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from tatara.evals.id_generator import IdGenerator
 
 RecordId = str
 
+EvalResult = Union[bool, int, float, str]
 
 @dataclass
 class EvalRecord:
     eval_name: str
     eval_description: str
-    result: bool | None
+    result: EvalResult
 
     def to_dict(self) -> Dict[str, Any]:
         return {

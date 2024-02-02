@@ -3,17 +3,18 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional
 
-from evals.eval_types import EvalRecord, EvalRow, EvalRun, EvalValue
-from evals.model_package import ModelInputType, ModelOutputType
-from evals.record import Record
-from evals.recorder import RecorderBase
+from tatara.evals.eval_types import EvalRecord, EvalRow, EvalRun, EvalValue, EvalResult
+from tatara.evals.model_package import ModelInputType, ModelOutputType
+from tatara.evals.record import Record
+from tatara.evals.recorder import RecorderBase
 from enum import Enum
 
 class EvalResultType(Enum):
-    BOOLEAN = "boolean"
+    BOOL = "bool"
     INT = "int"
     FLOAT = "float"
     CATEGORICAL = "categorical"
+
 
 class Eval(ABC):
     name: str
@@ -31,7 +32,7 @@ class Eval(ABC):
         self.records = records
 
     @abstractmethod
-    def eval_record(self, record: Record) -> Optional[bool]:
+    def eval_record(self, record: Record) -> EvalResult:
         """
         Eval a single record
         """
@@ -44,7 +45,7 @@ class Eval(ABC):
         eval_results = []
         for record in self.records:
             eval_result = EvalValue(
-                record_id=record.record_id,
+                record_id=record.id,
                 input=record.input,
                 output=record.output,
                 eval_record=EvalRecord(
@@ -63,7 +64,7 @@ class Eval(ABC):
         """
         for record in self.records:
             eval_row = {
-                "record_id": record.record_id,
+                "record_id": record.id,
                 "input": record.input,
                 "output": record.output,
                 "eval": {
