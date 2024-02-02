@@ -80,23 +80,3 @@ class TataraClientState:
                     LOG_RECORD_KEY_HAS_RATING: 1,
                 }
             )
-
-
-def _get_network_client() -> TataraNetworkClient:
-    if _get_client_state() is None:
-        raise Exception(
-            "Tatara Client State not initialized. Please call init() before using the client."
-        )
-    return _get_client_state().tatara_network_client
-
-
-def _get_client_state() -> TataraClientState:
-    if _tatara_client_state is None:
-        raise Exception(
-            "Tatara Client State not initialized. Please call init() before using the client."
-        )
-    return _tatara_client_state
-
-def _set_client_state(tatara_client_state: TataraClientState) -> None:
-    global _tatara_client_state
-    _tatara_client_state = tatara_client_state
