@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tatara"
-version = "0.1.2"
+version = "0.1.4"
 description = ""
 authors = ["Tatara <support@tatara.ai>"]
 readme = "README.md"
@@ -24,3 +24,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 pythonpath = ["tatara"]
+
+[tool.ruff.lint]
+ignore-init-module-imports = true
