@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional
 
-from tatara.evals.eval_types import EvalRecord, EvalRow, EvalRun, EvalValue, EvalResult
+from tatara.evals.eval_types import EvalResultWithMetadata, RecordWithMultipleEvalResults, EvalRun, EvalResult, RecordWithSingleEvalResult
 from tatara.evals.model_package import ModelInputType, ModelOutputType
 from tatara.evals.record import Record
 from tatara.evals.recorder import RecorderBase
@@ -38,43 +38,34 @@ class Eval(ABC):
         """
         raise NotImplementedError
 
-    def run_no_recorder(self) -> List[EvalValue]:
+    def run_no_recorder(self) -> EvalRun:
         """
         Run the eval without recording the results anywhere
         """
-        eval_results = []
+        single_eval_all_records = []
         for record in self.records:
-            eval_result = EvalValue(
+            record_with_single_eval_result = RecordWithSingleEvalResult(
                 record_id=record.id,
                 input=record.input,
                 output=record.output,
-                eval_record=EvalRecord(
+                eval_result_with_metadata=EvalResultWithMetadata(
                     eval_name=self.name,
                     eval_description=self.description,
                     result=self.eval_record(record),
                 ),
             )
-            eval_results.append(eval_result)
+            single_eval_all_records.append(record_with_single_eval_result)
 
-        return eval_results
+        return EvalRun(eval_rows=single_eval_all_records)
 
     def run(self, recorder: RecorderBase) -> None:
         """
         Run the eval with the RecorderBase
         """
-        for record in self.records:
-            eval_row = {
-                "record_id": record.id,
-                "input": record.input,
-                "output": record.output,
-                "eval": {
-                    "name": self.name,
-                    "description": self.description,
-                    "result": self.eval_record(record),
-                },
-            }
-            recorder.record_eval_row(eval_row)
-
+        single_eval_all_records = self.run_no_recorder()
+        recorder.record_eval_run(single_eval_all_records)
+        
+    
     def is_valid_input_type(self, model_input_type: ModelInputType) -> bool:
         return model_input_type in self.valid_input_types
 
@@ -88,32 +79,31 @@ class Evals:
     evals: List[Eval]
 
     def eval_values_to_rows(
-        self, all_eval_results: List[List[EvalValue]]
-    ) -> List[EvalRow]:
-        eval_rows = {}
-        for eval_results in all_eval_results:
-            for eval_result in eval_results:
+        self, all_evals_all_records: List[List[RecordWithSingleEvalResult]]
+    ) -> List[RecordWithMultipleEvalResults]:
+        record_with_multiple_eval_results = {}
+        for single_eval_all_records in all_evals_all_records:
+            for record_with_single_eval_result in single_eval_all_records:
                 # join the eval result for the record into a single row
-                record_id = eval_result.record_id
-                if record_id in eval_rows:
+                record_id = record_with_single_eval_result.record_id
+                if record_id in record_with_multiple_eval_results:
                     # just add the eval result to the existing record in the output
-                    eval_rows[record_id].add(eval_result)
+                    record_with_multiple_eval_results[record_id].add(record_with_single_eval_result)
                 else:
-                    eval_rows[record_id] = EvalRow(
+                    record_with_multiple_eval_results[record_id] = RecordWithMultipleEvalResults(
                         record_id=record_id,
-                        input=eval_result.input,
-                        output=eval_result.output,
-                        eval_values=[eval_result.eval_record],
+                        input=record_with_single_eval_result.input,
+                        output=record_with_single_eval_result.output,
+                        eval_results_with_metadata=[record_with_single_eval_result.eval_result_with_metadata],
                     )
-        return list(eval_rows.values())
+        return list(record_with_multiple_eval_results.values())
 
     def run(self, recorder: RecorderBase):
-        all_eval_results = []
+        all_evals_all_records = []
         for eval in self.evals:
-            eval_results: List[EvalValue] = eval.run_no_recorder()
-            all_eval_results.append(eval_results)
+            single_eval_all_records: EvalRun = eval.run_no_recorder()
+            all_evals_all_records.append(single_eval_all_records)
 
-        eval_rows = self.eval_values_to_rows(all_eval_results)
+        eval_rows = self.eval_values_to_rows(all_evals_all_records)
         eval_run = EvalRun(eval_rows=eval_rows)
-        # TODO: record the eval run as well via a separate endpoint in the recorder
         recorder.record_eval_run(eval_run)

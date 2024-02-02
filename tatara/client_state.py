@@ -20,7 +20,6 @@ from tatara.tatara_logging.rating import Rating
 from tatara.tatara_logging._background_queue_logger import BackgroundLazyQueueLogger
 from tatara.network._tatara_network_client import TataraNetworkClient
 
-_tatara_client_state = None
 
 class TataraClientState:
     current_trace: contextvars.ContextVar[Optional[Trace]]

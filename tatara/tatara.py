@@ -43,7 +43,7 @@ from .network._tatara_network_client import TataraNetworkClient
 DEFAULT_QUEUE_SIZE = 1000
 DEFAULT_FLUSH_INTERVAL = 60.0
 
-_tatara_client_state = None
+_tatara_client_state: Optional[TataraClientState] = None
 
 def init(project: str, queue_size: int = DEFAULT_QUEUE_SIZE, flush_interval: float = DEFAULT_FLUSH_INTERVAL, api_key: Optional[str] = None, is_dev: Optional[bool] = False):
     if api_key is None:
