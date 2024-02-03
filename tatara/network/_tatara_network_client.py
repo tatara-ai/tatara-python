@@ -1,6 +1,5 @@
 import requests
 from requests.adapters import HTTPAdapter
-from tatara.evals.eval_types import EvalRun
 from typing import Optional, Dict, List, Any
 import json
 from .endpoints import Endpoints
@@ -53,7 +52,7 @@ class TataraNetworkClient:
         )
 
     ### EVALS
-    def send_eval_run_post_request(self, eval_run: EvalRun) -> Optional[Response]:
+    def send_eval_run_post_request(self, eval_run) -> Optional[Response]:
         return self.send_post_request(
             f"{self.endpoints.eval_endpoint}/write", data=json.dumps(eval_run.to_dict())
         )
