@@ -5,12 +5,12 @@ from dataclasses import dataclass
 from requests.models import Response
 from requests.exceptions import HTTPError
 from tatara.tatara import _get_network_client
-
+from tatara.evals.record import Record
 
 @dataclass
 class Dataset:
     name: str
-    records: List[Dict[str, Any]]
+    records: List[Record]
     """
     You should never instantiate a Dataset directly. Instead, use the `init_dataset` function.
     """
@@ -35,22 +35,28 @@ class Dataset:
                 return False
         return True
 
-    def insert(self, records: List[Dict[str, Any]]) -> Optional[Dict]:
+    def insert(self, record_dicts: List[Dict[str, Any]]) -> Optional[Dict]:
         """
         Insert a record to a dataset that consists of input, output, and metadata
         """
-        for record in records:
-            if not self._is_valid_record(record):
+        for record_dict in record_dicts:
+            if not self._is_valid_record(record_dict):
                 logging.warning(
-                    f"Record {record} is not valid. must have input and output fields"
+                    f"Record {record_dict} is not valid. must have input and output fields"
                 )
 
         resp = _get_network_client().send_insert_records_post_request(
-            dataset_name=self.name, records=records
+            dataset_name=self.name, records=record_dicts
         )
         if resp and resp.ok:
-            # Add the records to the current dataset
-            self.records.extend(records)
+            for record_dict in record_dicts:
+                # construct a Record from each record_dict
+                record = Record(
+                    id=record_dict["id"],
+                    input=record_dict["input"],
+                    output=record_dict["output"],
+                )
+                self.records.append(record)
 
     def attach_records(self, record_ids: List[str]) -> None:
         # attach records to a dataset that already exist

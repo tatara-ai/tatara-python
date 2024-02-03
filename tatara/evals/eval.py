@@ -1,8 +1,7 @@
-import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional
-
+from tatara.dataset import get_dataset
 from tatara.evals.eval_types import EvalResultWithMetadata, RecordWithMultipleEvalResults, EvalRun, EvalResult, RecordWithSingleEvalResult
 from tatara.evals.model_package import ModelInputType, ModelOutputType
 from tatara.evals.record import Record
@@ -25,11 +24,9 @@ class Eval(ABC):
 
     def __init__(
         self,
-        records: list,
         seed: Optional[int] = 42,
     ):
         self.seed = seed
-        self.records = records
 
     @abstractmethod
     def eval_record(self, record: Record) -> EvalResult:
@@ -38,12 +35,12 @@ class Eval(ABC):
         """
         raise NotImplementedError
 
-    def run_no_recorder(self) -> EvalRun:
+    def run_no_recorder(self, records: List[Record]) -> EvalRun:
         """
         Run the eval without recording the results anywhere
         """
         single_eval_all_records = []
-        for record in self.records:
+        for record in records:
             record_with_single_eval_result = RecordWithSingleEvalResult(
                 record_id=record.id,
                 input=record.input,
@@ -58,11 +55,11 @@ class Eval(ABC):
 
         return EvalRun(eval_rows=single_eval_all_records)
 
-    def run(self, recorder: RecorderBase) -> None:
+    def run(self, records: List[Record], recorder: RecorderBase) -> None:
         """
         Run the eval with the RecorderBase
         """
-        single_eval_all_records = self.run_no_recorder()
+        single_eval_all_records = self.run_no_recorder(records)
         recorder.record_eval_run(single_eval_all_records)
         
     
@@ -70,12 +67,12 @@ class Eval(ABC):
         return model_input_type in self.valid_input_types
 
     def is_valid_output_type(self, model_output_type: ModelOutputType) -> bool:
-        logging.warning("")
         return model_output_type in self.valid_output_types
 
 
 @dataclass
 class Evals:
+    records: List[Record]
     evals: List[Eval]
 
     def eval_values_to_rows(
@@ -98,12 +95,16 @@ class Evals:
                     )
         return list(record_with_multiple_eval_results.values())
 
-    def run(self, recorder: RecorderBase):
+    def run(self, records: List[Record], recorder: RecorderBase):
         all_evals_all_records = []
         for eval in self.evals:
-            single_eval_all_records: EvalRun = eval.run_no_recorder()
+            single_eval_all_records: EvalRun = eval.run_no_recorder(records)
             all_evals_all_records.append(single_eval_all_records)
 
         eval_rows = self.eval_values_to_rows(all_evals_all_records)
         eval_run = EvalRun(eval_rows=eval_rows)
         recorder.record_eval_run(eval_run)
+    
+    def run_for_dataset(self, dataset_name: str, recorder: RecorderBase):
+        dataset = get_dataset(dataset_name)
+        self.run(dataset.records, recorder)

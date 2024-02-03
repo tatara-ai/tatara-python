@@ -25,7 +25,7 @@ class ModelPackage:
     model_output_type: ModelOutputType
     model_sha256: str = field(
         init=False
-    )  # a sha256 that uniquely identifies the model and hyperparamters
+    )  # a sha256 that uniquely identifies the model and hyperparameters
 
     @staticmethod
     def compute_model_sha256(
