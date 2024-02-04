@@ -22,25 +22,10 @@ class EvalResultWithMetadata:
 
 
 @dataclass
-class RecordWithSingleEvalResult:
-    record_id: RecordId
-    input: str
-    output: str
-    eval_result_with_metadata: EvalResultWithMetadata
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "record_id": self.record_id,
-            "input": self.input,
-            "output": self.output,
-            "eval_result_with_metadata": self.eval_result_with_metadata.__dict__,
-        }
-
-
-@dataclass
-class RecordWithMultipleEvalResults:
+class RecordWithEvalResults:
     id: str = field(init=False)
     record_id: RecordId
+    eval_run_id: str = field(init=False) # gets set when we add rows to an eval run
     input: str
     output: str
     eval_results_with_metadata: List[EvalResultWithMetadata]
@@ -48,8 +33,8 @@ class RecordWithMultipleEvalResults:
     def __post_init__(self):
         self.id = IdGenerator.generate_eval_run_row_uuid()
 
-    def add(self, record_with_single_eval: RecordWithSingleEvalResult) -> None:
-        self.eval_results_with_metadata.append(record_with_single_eval.eval_result_with_metadata)
+    def add(self, record_with_eval_results: "RecordWithEvalResults") -> None:
+        self.eval_results_with_metadata.extend(record_with_eval_results.eval_results_with_metadata)
     
     @property
     def num_evals(self) -> int:
@@ -61,31 +46,9 @@ class RecordWithMultipleEvalResults:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
+            "eval_run_id": self.eval_run_id,
             "record_id": self.record_id,
             "input": self.input,
             "output": self.output,
-            "eval_results_with_metadata": [record_with_single_eval.__dict__ for record_with_single_eval in self.eval_results_with_metadata],
-        }
-
-
-@dataclass
-class EvalRun:
-    id: str = field(init=False)
-    eval_rows: List[RecordWithMultipleEvalResults]
-
-    @property
-    def num_rows(self) -> int:
-        return len(self.eval_rows)
-
-    @property
-    def num_evals(self) -> int:
-        return sum([eval_row.num_evals for eval_row in self.eval_rows])
-
-    def __post_init__(self):
-        self.id = IdGenerator.generate_eval_run_uuid()
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "id": self.id,
-            "eval_rows": [eval_row.to_dict() for eval_row in self.eval_rows],
+            "eval_results": [{record_with_single_eval.eval_name: record_with_single_eval.result} for record_with_single_eval in self.eval_results_with_metadata],
         }
