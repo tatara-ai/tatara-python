@@ -11,18 +11,18 @@
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
-    "light": "#07C983",
-    "dark": "#0D9373",
+    "primary": "#FE6827",
+    "light": "#FE7F48",
+    "dark": "#FE6827",
     "anchors": {
-      "from": "#0D9373",
-      "to": "#07C983"
+      "from": "#FE6827",
+      "to": "#FE7F48"
     }
   },
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:hi@mintlify.com"
+      "url": "mailto:support@tatara.ai"
     }
   ],
   "topbarCtaButton": {
@@ -73,7 +73,6 @@
   ],
   "footerSocials": {
     "twitter": "https://twitter.com/tatara_ai",
-    "github": "https://github.com/mintlify",
     "linkedin": "https://www.linkedin.com/company/tatara-ai"
   }
 }
