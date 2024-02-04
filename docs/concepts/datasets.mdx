@@ -1,0 +1,39 @@
+---
+title: "Datasets"
+---
+
+A dataset is a collection of records. You can create a dataset with
+
+```python
+from tatara.dataset import Dataset, init_dataset, get_dataset
+my_test_dataset = init_dataset("my_test_dataset")
+```
+
+This dataset is empty, so we'll add some records to it.
+
+```python
+new_records = [
+{
+        "input":"my test input for record 1",
+        "output":"my test output for record 1"
+},
+{
+        "input":"my test input for record 2",
+        "output":"my test output for record 2",
+}
+]
+
+ds.insert(new_records)
+```
+
+Now all of this data has been saved to Tatara, so you can view it in the UI by going to <>.
+
+You can also get a dataset by its name in a new session.
+
+```python
+my_test_dataset = get_dataset("my_test_dataset")
+```
+
+## Record
+
+A record is a single data point in a dataset. Is it _either_ a Span or custom input and output you've curated yourself.
