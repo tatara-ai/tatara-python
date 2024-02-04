@@ -1,0 +1,45 @@
+---
+title: "Eval Quickstart"
+description: "Start evaluating your models with Tatara"
+---
+
+### Pre-requisite
+
+Make sure you've followed the setup instructions in the [installation guide](/setup).
+
+## Evals with Tatara
+
+We provide an eval class that you can subclass to create your own evals. You can then run your evals with a recorder to save the results.
+
+```python
+from tatara.evals.eval import Eval
+from tatara.recorder import FileRecorder
+
+
+class FakeCreativityCheck(Eval):
+    name: str = "creativity_check"
+    description: str = "score the creativity of a sample as 0.5"
+
+    def eval_record(self, record: dict) -> float:
+        return 0.5
+
+
+```
+
+Let's walk through what's happening. First, we implement `eval_record`, which contains the logic that scores the sample. In this case, we're just returning a constant value of 0.5. Then, we run the eval with a recorder, which saves the results to a file.
+
+## Running the Eval
+
+Now we can run the eval with
+
+```python
+fcc = FakeCreativityCheck.run(FileRecorder("creativity_check_results.json"))
+```
+
+This will save the results to a file called `creativity_check_results.json`.
+
+To save the results to Tatara you'll want to use the `TataraRecorder` instead.
+
+```python
+from tatara.evals.recorder import TataraRecorder
+```
