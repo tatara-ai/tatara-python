@@ -1,0 +1,10 @@
+---
+title: "Traces"
+---
+
+A trace is a collection of model calls that belong together. You can create a trace with
+
+```python
+with tatara.start_trace(event=trace_name, id_=<your_trace_id>, user_id=<you_user_id>):
+    # do stuff
+```

@@ -57,7 +57,7 @@
       "group": "Get Started",
       "pages": ["introduction", "setup", "quickstarts/logging", "quickstarts/evals"]
     },
-    {"group": "Concepts", "pages": ["concepts/datasets", "concepts/evals", "concepts/logging"]},
+    {"group": "Concepts", "pages": ["concepts/datasets", "concepts/evals", "concepts/traces", "concepts/spans"]},
     {
       "group": "API Documentation",
       "pages": ["api-reference/introduction"]
