@@ -2,18 +2,13 @@ import atexit
 import json
 from abc import ABC, abstractmethod
 
-from tatara.evals.eval_types import RecordWithEvalResults
-
 MIN_FLUSH_EVENTS = 100
-MIN_FLUSH_SECONDS = 10
-
 
 class RecorderBase(ABC):
     def __init__(self):
         self.results = []
         # flush_events results on exit
         atexit.register(self.flush_events)
-
 
     @abstractmethod
     def flush_events(self):
@@ -27,8 +22,18 @@ class PrintRecorder(RecorderBase):
     def __init__(self):
         super().__init__()
 
-    def record(self, eval_row: RecordWithEvalResults):
-        print(eval_row.to_dict())
+    
+    def flush_events(self):
+        for eval_run in self.results:
+            print(json.dumps(eval_run.to_dict()))
+        self.results = []
+
+
+    def record_eval_run(self, eval_run):
+        self.results.append(eval_run)
+        self.flush_events()
+
+
 
 
 class FileRecorder(RecorderBase):
@@ -36,8 +41,8 @@ class FileRecorder(RecorderBase):
         super().__init__()
         self.event_filepath = event_filepath
 
-    def record(self, eval_row: RecordWithEvalResults):
-        self.results.append(eval_row)
+    def record(self, eval_run):
+        self.results.append(eval_run)
         if len(self.results) > MIN_FLUSH_EVENTS:
             self.flush_events()
 

@@ -1,7 +1,6 @@
 from .recorder import RecorderBase, MIN_FLUSH_EVENTS
 from tatara.network._tatara_network_client import TataraNetworkClient
 from tatara.tatara import _get_network_client
-from tatara.evals.eval import EvalRun
 
 class TataraRecorder(RecorderBase):
     def __init__(self):
@@ -17,7 +16,7 @@ class TataraRecorder(RecorderBase):
         self.eval_runs = []
     
 
-    def record_eval_run(self, eval_run: EvalRun):
+    def record_eval_run(self, eval_run):
         if self.total_rows > MIN_FLUSH_EVENTS:
             self.flush_events()
         self.eval_runs.append(eval_run)
