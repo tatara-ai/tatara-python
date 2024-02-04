@@ -1,7 +1,7 @@
 from .recorder import RecorderBase, MIN_FLUSH_EVENTS
 from tatara.network._tatara_network_client import TataraNetworkClient
 from tatara.tatara import _get_network_client
-from tatara.evals.eval_types import EvalRun
+from tatara.evals.eval import EvalRun
 
 class TataraRecorder(RecorderBase):
     def __init__(self):

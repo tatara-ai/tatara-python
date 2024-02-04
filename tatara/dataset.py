@@ -11,6 +11,7 @@ from tatara.tatara import _get_network_client
 class Dataset:
     name: str
     records: List[Dict[str, Any]]
+    id: Optional[str] = None
     """
     You should never instantiate a Dataset directly. Instead, use the `init_dataset` function.
     """
