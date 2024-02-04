@@ -1,51 +1,26 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 from tatara.evals.eval_types import EvalResultWithMetadata, RecordWithEvalResults, EvalResult
 from tatara.evals.record import Record
-from tatara.evals.recorder import RecorderBase
-from enum import Enum
+from tatara.evals.recorder import PrintRecorder, RecorderBase
+from tatara.evals.tatara_recorder import TataraRecorder
 from typing import Any, Dict
 from dataclasses import field
 from tatara.evals.id_generator import IdGenerator
 from tatara.dataset import Dataset
-
-class EvalResultType(Enum):
-    BOOL = "bool"
-    INT = "int"
-    FLOAT = "float"
-    CATEGORICAL = "categorical"
-
-    def __str__(self):
-        return self.value
-    
-    def to_str(self):
-        return self.value
+import typing
 
 
-class Eval(ABC):
+@dataclass
+class Eval:
     name: str
     description: str
-    eval_result_type: EvalResultType
+    records: List[Record]
+    eval_record_fn: Callable[[Record], EvalResult]
+    dataset: Optional[Dataset] = None
+    seed: Optional[int] = 42
 
-    def __init__(
-        self,
-        records: list,
-        dataset: Optional[Dataset] = None,
-        seed: Optional[int] = 42,
-    ):
-        self.seed = seed
-        self.records = records
-        self.dataset = dataset
-    
-
-    @abstractmethod
-    def eval_record(self, record: Record) -> EvalResult:
-        """
-        Eval a single record
-        """
-        raise NotImplementedError
 
     def run_no_recorder(self) -> "EvalRun":
         """
@@ -60,7 +35,7 @@ class Eval(ABC):
                 eval_results_with_metadata=[EvalResultWithMetadata(
                     eval_name=self.name,
                     eval_description=self.description,
-                    result=self.eval_record(record),
+                    result=self.eval_record_fn(record),
                 )],
             )
             single_eval_all_records.append(record_with_single_eval_result)
@@ -76,10 +51,20 @@ class Eval(ABC):
         
     
     def to_dict(self) -> Dict[str, Any]:
+        return_type_raw_str = typing.get_type_hints(self.eval_record_fn).get("return")
+        eval_result_type = "unknown"
+        if return_type_raw_str == float:
+            eval_result_type = "float"
+        elif return_type_raw_str == int:
+            eval_result_type = "int"
+        elif return_type_raw_str == str:
+            eval_result_type = "str"
+        elif return_type_raw_str == bool:
+            eval_result_type = "bool"
         return {
             "name": self.name,
             "description": self.description,
-            "eval_result_type": self.eval_result_type.to_str(),
+            "eval_result_type": eval_result_type,
         }
 
 @dataclass
@@ -106,7 +91,12 @@ class Evals:
                     )
         return list(record_with_multiple_eval_results.values())
 
-    def run(self, recorder: RecorderBase):
+    def run(self, local: bool = False) -> None:
+        """
+        Run evals. If local is True, the evals will be printed to the console.
+        """
+        recorder = TataraRecorder() if not local else PrintRecorder()
+        
         all_eval_runs = []
         for eval in self.evals:
             eval_run: EvalRun = eval.run_no_recorder()
