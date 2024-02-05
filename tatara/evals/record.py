@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from tatara.evals.model_package import ModelPackage
@@ -6,15 +6,13 @@ from tatara.evals.model_package import ModelPackage
 
 @dataclass
 class Record:
-    id: str
+    id: str = field(init=False)
     input: str
     output: str
     model_package: Optional[ModelPackage] = None
 
     def __post_init__(self):
-        # check that id, input, and output are not None
-        if not self.id:
-            raise ValueError("id cannot be None")
+        # check that input and output are not None
         if not self.input:
             raise ValueError("input cannot be None")
         if not self.output:

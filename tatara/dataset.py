@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from requests.models import Response
 from requests.exceptions import HTTPError
 from tatara.tatara import _get_network_client
-
+from tatara.evals.eval import Evals, Eval
 
 @dataclass
 class Dataset:
@@ -50,8 +50,9 @@ class Dataset:
             dataset_name=self.name, records=records
         )
         if resp and resp.ok:
+            records_with_ids = resp.json()
             # Add the records to the current dataset
-            self.records.extend(records)
+            self.records.extend(records_with_ids)
 
     def attach_records(self, record_ids: List[str]) -> None:
         # attach records to a dataset that already exist
@@ -67,6 +68,13 @@ class Dataset:
     def attach_record(self, record_id: str) -> None:
         # attach a record to a dataset that already exists
         self.attach_records([record_id])
+    
+    def run_evals(self, list_of_evals: List[Eval], print_only: bool = False) -> None:
+        """
+        Run evals on the dataset. If local is True, the evals will be printed to the console.
+        """
+        evals = Evals(list_of_evals)
+        evals.run(self, print_only=print_only)
 
 
 def init_dataset(name: str) -> Dataset:
@@ -87,7 +95,7 @@ def get_dataset(name: str) -> Dataset:  # type: ignore
             name
         )
         ds_data = ds_data_response.json()
-        return Dataset(name=name, records=ds_data["records"])
+        return Dataset(name=name, id=ds_data['id'], records=ds_data["records"])
     except HTTPError as e:
         if e.response.status_code == 404:
             print(f'`get_dataset` failed. The dataset "{name}" does not exist.')
