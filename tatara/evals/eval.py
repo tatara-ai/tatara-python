@@ -16,7 +16,7 @@ import time
 @dataclass
 class Eval:
     name: str
-    eval_record_fn: Callable[[Record], EvalResult]
+    eval_fn: Callable[[Record], EvalResult]
     description: Optional[str] = None
     seed: Optional[int] = 42
 
@@ -34,7 +34,7 @@ class Eval:
                 eval_results_with_metadata=[EvalResultWithMetadata(
                     eval_name=self.name,
                     eval_description=self.description if self.description else "",
-                    result=self.eval_record_fn(record),
+                    result=self.eval_fn(record),
                 )],
             )
             single_eval_all_records.append(record_with_single_eval_result)
@@ -50,7 +50,7 @@ class Eval:
         
     
     def to_dict(self) -> Dict[str, Any]:
-        return_type_raw_str = typing.get_type_hints(self.eval_record_fn).get("return")
+        return_type_raw_str = typing.get_type_hints(self.eval_fn).get("return")
         eval_result_type = "unknown"
         if return_type_raw_str == float:
             eval_result_type = "float"
