@@ -7,6 +7,8 @@ from requests.exceptions import HTTPError
 from tatara.tatara import _get_network_client
 from tatara.evals.eval import Evals, Eval
 
+
+# TODO: make sure methods in Dataset are lazy and don't do anything until an op is called that needs the data
 @dataclass
 class Dataset:
     name: str
@@ -112,3 +114,14 @@ def get_or_init_dataset(name: str) -> Dataset:
         return get_dataset(name)
     except Exception:
         return init_dataset(name)
+
+
+def run_evals(list_of_evals: List[Eval], dataset_name: Any, print_only: bool = False) -> None: # TODO: make this a dataset type
+    """
+    Run evals on the dataset. If local is True, the evals will be printed to the console.
+    """
+    evals = Evals(list_of_evals)
+    print("Fetching dataset: {}".format(dataset_name))
+    dataset = get_dataset(dataset_name)
+    print("Running evals on dataset.")
+    evals.run(dataset, print_only=print_only)
