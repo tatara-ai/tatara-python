@@ -103,3 +103,12 @@ def get_dataset(name: str) -> Dataset:  # type: ignore
             raise
     except Exception as e:
         print(f"Exception occurred when getting dataset: {e}")
+
+def get_or_init_dataset(name: str) -> Dataset:
+    """
+    Get a dataset from the tatara server by name. If the dataset does not exist, it will be created.
+    """
+    try:
+        return get_dataset(name)
+    except Exception as e:
+        return init_dataset(name)
