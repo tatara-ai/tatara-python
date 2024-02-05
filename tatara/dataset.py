@@ -110,5 +110,5 @@ def get_or_init_dataset(name: str) -> Dataset:
     """
     try:
         return get_dataset(name)
-    except Exception as e:
+    except Exception:
         return init_dataset(name)
