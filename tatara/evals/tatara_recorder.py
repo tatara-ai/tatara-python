@@ -12,7 +12,9 @@ class TataraRecorder(RecorderBase):
 
     def flush_events(self):
         for eval_run in self.eval_runs:
-            self.tatara_network_client.send_eval_run_post_request(eval_run)
+            res = self.tatara_network_client.send_eval_run_post_request(eval_run)
+            if res is not None and res.status_code != 200:
+                print(f"Failed to send eval run to server: {res.text}")
         self.eval_runs = []
     
 

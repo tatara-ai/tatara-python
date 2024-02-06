@@ -40,6 +40,7 @@ class TataraClientState:
         self.current_span = contextvars.ContextVar("current_span", default=None)
 
         self.tatara_network_client = TataraNetworkClient(
+            project=project,
             api_key=self.api_key, is_dev=is_dev
         )
         self.bglq_logger = BackgroundLazyQueueLogger(
