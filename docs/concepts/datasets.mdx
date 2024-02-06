@@ -2,7 +2,7 @@
 title: "Datasets"
 ---
 
-A dataset is a collection of records. You can create a dataset with
+A dataset is a collection of records. You can create a dataset by doing the following:
 
 ```python
 from tatara import Dataset, init_dataset, get_dataset
@@ -33,5 +33,7 @@ Now all of this data has been saved to Tatara, so you can view it in the UI by g
 You can also get a dataset by its name in a new session.
 
 ```python
+from tatara import tatara, get_dataset
+tatara.init(project="my_project")
 my_test_dataset = get_dataset("my_test_dataset")
 ```

@@ -29,47 +29,14 @@
     "name": "Dashboard",
     "url": "https://dashboard.mintlify.com"
   },
-  "tabs": [
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
-  ],
-  "anchors": [
-    {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
-    },
-    {
-      "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
-    },
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
-    }
-  ],
+
+
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["introduction", "setup", "quickstarts/logging", "quickstarts/evals"]
+      "pages": [ "setup", "quickstarts/logging", "quickstarts/evals"]
     },
-    {"group": "Concepts", "pages": ["concepts/datasets", "concepts/evals", "concepts/traces", "concepts/spans"]},
-    {
-      "group": "API Documentation",
-      "pages": ["api-reference/introduction"]
-    },
-    {
-      "group": "Endpoint Examples",
-      "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
-      ]
-    }
+    {"group": "Concepts", "pages": ["concepts/datasets", "concepts/evals", "concepts/traces", "concepts/spans"]}
   ],
   "footerSocials": {
     "twitter": "https://twitter.com/tatara_ai",

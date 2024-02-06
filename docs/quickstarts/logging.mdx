@@ -8,94 +8,108 @@ Before you start, you'll need to install Tatara. If you haven't yet, you can get
 
 ## Logging to Tatara
 
+### Initializing the client
+
 Begin by initializing the client with your project name. The project name tells Tatara which project to log to.
 
 ```python
 from tatara import tatara
-
 # By default, logs flush when:
-# * 60 seconds are update
+# * 60 seconds are up
 # * the max queue size is hit (1000 by default)
 # Here, we set the queue size to 1 and the flush interval to 1 second
 # so we can see the logs immediately.
 tatara.init(project="my test project", queue_size=1, flush_interval=1)
 ```
 
+### Understanding Traces and Spans
+
 Tatara has a concept of a [trace](/concepts#traces), which is a collection of [spans](/concepts#span). A trace is a logical unit of work that can be used to group spans together.
 Because all of our spans are model calls, you can think of a trace as a "chain" of model calls.
 
-Below, we make two calls to OpenAI's API.
-First we create a function that calls OpenAI's API and logs the result to Tatara.
-Then we create a trace and two spans, one for each call to OpenAI's API.
+Let's walk through an example of generating a character image. This entire process will be a Trace and each model call will be a span within it.
+
+## Generating a character image
+
+First, we'll make our LLM call to generate a visual description of the character. Then, we'll use the visual description to generate an image of the character using a Diffusion model.
 
 ```python
-openai_client = OpenAI()
-model_name = "gpt-3.5-turbo-1106"
-freq_penalty = 0.1
-temperature = 0.1
-max_tokens = 200
+from openai import OpenAI
+from tatara.tatara_types import ImageFormat
+from tatara.tatara_types import LLMParams
+import requests
+from tatara.provider_enum import ProviderEnum
+from tatara.tatara_types import LLMUsageMetrics
 
+MODEL_NAME = "gpt-3.5-turbo-1106"
+FREQ_PENALTY = 0.1
+TEMPERATURE = 0.1
+MAX_TOKENS = 200
 
-def openai_completion_with_logging(
-    prompt: str,
-    model_name: str,
-    temperature: float,
-    freq_penalty: float,
-    max_tokens: int,
-):
+def generate_visual_description(character_description: str, openai_client: OpenAI):
+    print("Generating visual description of your character.")
+    character_visual_description_prompt  = "Generate a visual description of the following character: {}".format(character_description)
+
     response = openai_client.chat.completions.create(
-        messages=[{"role": "user", "content": prompt}],
-        model=model_name,
-        temperature=temperature,
-        frequency_penalty=freq_penalty,
-        max_tokens=max_tokens,
+            messages=[{"role": "user", "content": character_visual_description_prompt}],
+            model=MODEL_NAME,
+            temperature=TEMPERATURE,
+            frequency_penalty=FREQ_PENALTY,
+            max_tokens=MAX_TOKENS,
     )
     ret = response.choices[0].message.content
-    if ret is None:
-        raise Exception("OpenAI returned 0 length response")
+    tatara.current_span().log_llm_success(prompt=character_description, output=ret,
+                params=LLMParams(
+                model=MODEL_NAME,
+                temperature=TEMPERATURE,
+                frequency_penalty=FREQ_PENALTY,
+                max_tokens=MAX_TOKENS,
+                provider=ProviderEnum.OPENAI,
+            ),
+            usage_metrics=LLMUsageMetrics.from_oai_completion_usage(
+                response.usage
+            ))
 
-    # calling current_span will get the span that is currently active
-    # this is useful if we're several calls deep in the stack and want to log something
-    # this way we don't have to pass around the span object
-    tatara_client.current_span().log_llm_success(
-        prompt=prompt,
-        output=ret,
-        params=LLMParams(
-            model=model_name,
-            temperature=temperature,
-            frequency_penalty=freq_penalty,
-            max_tokens=max_tokens,
-            provider=ProviderEnum.OPENAI,
-        ),
-        usage_metrics=LLMUsageMetrics.from_oai_completion_usage(response.usage)
-        if response.usage
-        else None,
-    )
     return ret
 ```
 
-Now we'll create a trace and two spans, one for each call to OpenAI's API.
+You'll notice in the above code that we are using `tatara.current_span().log_llm_success` to log the output of the LLM model call. This will log the output of the model call to Tatara, along with the parameters used to make the call and the usage metrics of the call.
+
+Now we'll handle the Diffusion model call to generate the character image.
 
 ```python
-trace_name = "poem_and_critique"
-uuid4: str = str(uuid.uuid4())
+def generate_character_image(character_visual_description: str, openai_client: OpenAI):
+    print("Generating character image")
+    response = openai_client.images.generate(
+        model="dall-e-3",
+        prompt=character_visual_description,
+        size="1024x1024",
+        quality="standard",
+        n=1,
+    )
+    image_url = response.data[0].url
+    img_data = bytes(requests.get(image_url).content)
+    tatara.current_span().log_diffusion_success_with_image_data(img_data, ImageFormat.PNG, prompt=character_visual_description)
+    return img_data
+```
 
-# I'll specify my own id for the trace via the id_ param so I can search for it in the UI later on.
-# I'll also specify the user_id param, which is _your_ user_id, so you know which of your users is responsible for this interaction.
-with tatara_client.start_trace(event=trace_name, id_=uuid4, user_id="user-123"):
-    with tatara_client.start_span(event="write_poem"):
-        poem_prompt = "Write me a poem in the style of William Carlos Williams"
-        poem = openai_completion_with_logging(
-            poem_prompt, model_name, temperature, freq_penalty, max_tokens
-        )
-    with tatara_client.start_span(event="write_critique"):
-        poem_critique_prompt = (
-            "Write me a critique of this poem in the style of Michiko Kakutani: "
-            + poem_prompt
-        )
-        critique = openai_completion_with_logging(
-            poem_critique_prompt, model_name, temperature, freq_penalty, max_tokens
-        )
+Let's put it all together. We'll initialize our client, and wrap our model calls in a trace and spans so that we can see the entire process in the Tatara dashboard.
+
+```python
+if __name__ == "__main__":
+    tatara.init(project="test_project", flush_interval=1, queue_size=1)
+    openai_client = OpenAI()
+
+
+    character_description = "a cyborg with a bionic arm and a holoband."
+    visual_description_event_name = "generate_visual_description"
+    image_event_name = "generate_character_image"
+
+    with tatara.start_trace(event="create_character_image"):
+        with tatara.start_span(event=visual_description_event_name):
+          character_visual_description = generate_visual_description(character_description, openai_client)
+        with tatara.start_span(event=image_event_name, parent_event=visual_description_event_name):
+            character_image = generate_character_image(character_visual_description, openai_client)
 ```
 
 ## Viewing your logs
