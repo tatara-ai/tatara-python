@@ -2,7 +2,9 @@
 title: "Traces"
 ---
 
-A trace is a collection of model calls that belong together. Suppose I want to generate a character image from a character description. I would first generate a visual description of the character and then use that visual description to generate the image. I would want to group these two calls together in a trace.
+A trace is a collection of model calls that belong together.
+
+Suppose I want to generate a character image from a character description. I would first generate a visual description of the character and then use that visual description to generate the image. I would want to group these two calls together in a trace.
 
 ```python
 with tatara.start_trace(event="create_character_image"):
