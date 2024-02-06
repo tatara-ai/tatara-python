@@ -95,7 +95,6 @@ class Evals:
         Run evals. If print_only is True, the evals will be printed to the console and not recorded.
         """
         recorder = TataraRecorder() if not print_only else PrintRecorder()
-        
         all_eval_runs = []
         for eval in self.evals:
             eval_run: EvalRun = eval.run_no_recorder(dataset=dataset)
