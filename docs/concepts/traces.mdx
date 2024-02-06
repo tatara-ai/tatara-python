@@ -2,9 +2,18 @@
 title: "Traces"
 ---
 
-A trace is a collection of model calls that belong together. You can create a trace with
+A trace is a collection of model calls that belong together. Suppose I want to generate a character image from a character description. I would first generate a visual description of the character and then use that visual description to generate the image. I would want to group these two calls together in a trace.
 
 ```python
-with tatara.start_trace(event=trace_name, id_=<your_trace_id>, user_id=<you_user_id>):
-    # do stuff
+with tatara.start_trace(event="create_character_image"):
+    with tatara.start_span(event=visual_description_event_name):
+        character_visual_description = generate_visual_description(character_description, openai_client)
+    with tatara.start_span(event=image_event_name, parent_event=visual_description_event_name):
+        character_image = generate_character_image(character_visual_description, openai_client)
+```
+
+You can also pass in a `user_id` and an `id_` to the `start_trace` function to associate the trace with your user and to give the trace a unique identifier that you can use to join it to other data.
+
+```python
+with tatara.start_trace(event="create_character_image", user_id="user_id", id_="trace_id"):
 ```
