@@ -37,15 +37,8 @@ If you want to keep track of the parent of the span, you can pass the parent spa
 
 ```python
 with tatara.start_span(event="generate_image", parent_event="generate_visual_description"):
-
+    # make model calls here
 ```
 
 A parent call in this case, is a model call that your call depends on. For example, your diffusion model might depend on an LLM call.
-In this case, the LLM call's span would be the parent of the diffusion call's span
-
-```python
-{
-    "prompt": "Generate a visual description of a dog",
-    "response": "A dog is a domesticated carnivore of the family Canidae. It is part of the wolf-like canids, and is the most widely abundant terrestrial carnivore."
-}
-```
+In this case, the LLM call's span would be the parent of the diffusion call's span.

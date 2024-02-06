@@ -8,7 +8,39 @@ Before you start, you'll need to install Tatara. If you haven't yet, you can get
 
 ## Evals with Tatara
 
-You can create an eval by providing an evaluation function.
+An eval is a function that takes in a dataset, which contains a model's outputs, and a function to evaluate that dataset. The eval gives you a score for the model's outputs.
+The score can be an int, float, bool, or categorical value (string). All evals are instances of [Eval](https://github.com/tatara-ai/tatara-python/blob/main/tatara/evals/eval.py#L19).
+
+## Writing an Eval
+
+Let's start by making the necessary imports and by creating an OpenAI client, which we'll use to call GPT-3.5, who will be responsible for our Eval.
+
+```python
+from tatara import tatara, Eval, Record, init_dataset, run_evals
+from openai import OpenAI
+from tatara import Record
+
+model_name = "gpt-3.5-turbo-1106"
+freq_penalty = 0.1
+temperature = 0.1
+max_tokens = 200
+openai_client = OpenAI()
+```
+
+Now we'll write a function to create a dataset which will contain the data we want to evaluate.
+
+```python
+
+def create_dataset():
+    ds = init_dataset("test_dataset")
+    new_records = [
+    {"input":"Generate a description of a character named Cyborg Guy. Cyborg Guy is a cyberpunk robot who lives in the city of Zail.",
+    "output":"You are a cyborg living in the the futuristic city of Zail. You have a bionic arm and a holoband. You're walking down the dark city streets while neon lights flash brightly above you."}
+    ]
+    ds.insert(new_records)
+```
+
+Now we'll write a function to check if the output of the model is cyberpunk fiction. We'll use GPT-3.5 to do this.
 
 ```python
 def is_cyberpunk_check(record: Record) -> bool:
@@ -27,24 +59,60 @@ def is_cyberpunk_check(record: Record) -> bool:
     elif "<NOT_CYBERPUNK>" in ret:
         return False
     else:
+        # If the model doesn't output a clear answer, we it again until it does
         return is_cyberpunk_check(record)
-
-  cyberpunk_check = Eval(
-        name = "is_cyberpunk_check",
-        description = "Checks whether the text is cyberpunk fiction. If it is, it returns True. If it is not, it returns False. If it is unsure, it will call itself again.",
-        eval_fn = is_cyberpunk_check,
-    )
 ```
 
-Let's walk through what's happening. First, we implement a function called `is_cyberpunk_check`, which checks whether the output of a model call -- `record['output']` contains cyberpunk content.
-
-## Running the Eval
-
-To run the eval over a dataset, you can use `run_evals`, which takes a list of evals and a [dataset](/concepts/datasets) name.
+And finally, we'll run it.
 
 ```python
-my_evals = [cyberpunk_check, creativity_score_eval]
-run_evals(my_evals, ds_name)
+if __name__ == "__main__":
+    my_test_project = "test_project"
+    tatara.init(project=my_test_project, flush_interval=1, queue_size=1)
+
+    create_dataset()
+
+    cyberpunk_check = Eval(
+            name = "is_cyberpunk_check",
+            description = "Checks whether the text is cyberpunk fiction. If it is, it returns True. If it is not, it returns False.",
+            eval_fn = is_cyberpunk_check,
+        )
+
+    run_evals([cyberpunk_check], "test_dataset", print_only=True)
+
+```
+
+In summary, we've created a dataset with a single record, which contains a prompt and a model output. We then implemented an eval that checks whether the output of a model call contains cyberpunk content. We then ran the eval over the dataset using `run_evals`.
+
+If you run this code, it will print the results of the eval to the console and you'll see something like this:
+
+```json
+{
+  "id": "er_2fb61f79-1645-4640-98a2-e3668f9ecbf0",
+  "dataset": {
+    "id": "d_e4953ac5-6771-4084-9c89-5fde4a75a61f",
+    "name": "test_dataset"
+  },
+  "evals": [
+    {
+      "name": "is_cyberpunk_check",
+      "description": "Checks whether the text is cyberpunk fiction. If it is, it returns True. If it is not, it returns False.",
+      "eval_result_type": "bool"
+    }
+  ],
+  "num_rows": 1,
+  "eval_rows": [
+    {
+      "id": "err_8885540b-ac63-4a87-8599-1190e3d483db",
+      "eval_run_id": "er_2fb61f79-1645-4640-98a2-e3668f9ecbf0",
+      "record_id": "r_eea4829a-7da2-4810-9d37-6fe7be22201a",
+      "input": "Generate a description of a character named Cyborg Guy. Cyborg Guy is a cyberpunk robot who lives in the city of Zail.",
+      "output": "You are a cyborg living in the the futuristic city of Zail. You have a bionic arm and a holoband. You're walking down the dark city streets while neon lights flash brightly above you.",
+      "eval_results": [{ "is_cyberpunk_check": true }]
+    }
+  ],
+  "timestamp": 1707200867
+}
 ```
 
 <Info>
@@ -56,6 +124,6 @@ run_evals(my_evals, ds_name)
 
 ## Viewing the Results
 
-Once `run_evals` is done running, you'll be able to view the results in the [Tatara UI](https://app.tatara.ai/evaluations).
+Once `run_evals` is done running, you'll be able to view the results in the console. To send them to Tatara, remove `print_only=True` in the `run_evals` call above. Once you run the code again, head over to the [Tatara UI](https://app.tatara.ai/evaluations) to view your Eval run.
 
 <img height="800" src="/images/eval_run_with_arrow.png" />
