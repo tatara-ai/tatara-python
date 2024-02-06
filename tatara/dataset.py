@@ -71,13 +71,6 @@ class Dataset:
         # attach a record to a dataset that already exists
         self.attach_records([record_id])
     
-    def run_evals(self, list_of_evals: List[Eval], print_only: bool = False) -> None:
-        """
-        Run evals on the dataset. If local is True, the evals will be printed to the console.
-        """
-        evals = Evals(list_of_evals)
-        evals.run(self, print_only=print_only)
-
 
 def init_dataset(name: str) -> Dataset:
     """
