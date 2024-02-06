@@ -5,15 +5,15 @@ title: "Spans"
 A span is a single model call. A span is part of a trace. You can create a span using `start_span`. For example,
 
 ```python
-   with tatara.start_span(event="generate_visual_description"):
-        prompt = "Generate a visual description of a dog"
-            response = openai_client.chat.completions.create(
-                messages=[{"role": "user", "content": prompt}],
-                model=model_name,
-                temperature=temperature,
-                frequency_penalty=freq_penalty,
-                max_tokens=max_tokens,
-            )
+with tatara.start_span(event="generate_visual_description"):
+    prompt = "Generate a visual description of a dog"
+        response = openai_client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model=model_name,
+            temperature=temperature,
+            frequency_penalty=freq_penalty,
+            max_tokens=max_tokens,
+        )
 ```
 
 Once the span has started, you can use it to log the LLM output
@@ -36,7 +36,7 @@ tatara.current_span().log_llm_success(prompt=character_description, output=ret,
 If you want to keep track of the parent of the span, you can pass the parent span as an argument
 
 ```python
-   with tatara.start_span(event="generate_image", parent_event="generate_visual_description"):
+with tatara.start_span(event="generate_image", parent_event="generate_visual_description"):
 
 ```
 
