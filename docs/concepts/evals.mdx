@@ -3,4 +3,33 @@ title: "Evals"
 ---
 
 An eval is a function that takes in a dataset, which contains a model's outputs, and a function to evaluate that dataset. The eval gives you a score for the model's outputs.
-The score can be an int, float, bool, or categorical value (string). All evals must subclass [Eval](https://github.com/tatara-ai/tatara-python/blob/main/tatara/evals/eval.py#L19).
+The score can be an int, float, bool, or categorical value (string). All evals are instances of [Eval](https://github.com/tatara-ai/tatara-python/blob/main/tatara/evals/eval.py#L19).
+
+```python
+from tatara import Eval
+def is_cyberpunk_check(record: Record) -> bool:
+    prompt = "Check that the following text is an example of cyberpunk fiction: \n\n {}\n\n If it is cyberpunk, write <CYBERPUNK>. If it is not, write <NOT_CYBERPUNK>.".format(record['output'])
+    response = openai_client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model=model_name,
+        temperature=temperature,
+        frequency_penalty=freq_penalty,
+        max_tokens=max_tokens,
+
+    )
+    ret = response.choices[0].message.content
+    if "<CYBERPUNK>" in ret:
+        return True
+    elif "<NOT_CYBERPUNK>" in ret:
+        return False
+    else:
+        return is_cyberpunk_check(record)
+
+  cyberpunk_check = Eval(
+        name = "is_cyberpunk_check",
+        description = "Checks whether the text is cyberpunk fiction. If it is, it returns True. If it is not, it returns False. If it is unsure, it will call itself again.",
+        eval_fn = is_cyberpunk_check,
+    )
+```
+
+<img height="800" src="/images/eval_run_with_arrow.png" />
