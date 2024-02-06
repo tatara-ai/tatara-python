@@ -1,45 +1,61 @@
 ---
 title: "Eval Quickstart"
-description: "Start evaluating your models with Tatara"
 ---
 
-### Pre-requisite
+### Prerequisites
 
-Make sure you've followed the setup instructions in the [installation guide](/setup).
+Before you start, you'll need to install Tatara. If you haven't yet, you can get set up by following the instructions in the [installation guide](/setup).
 
 ## Evals with Tatara
 
-We provide an eval class that you can subclass to create your own evals. You can then run your evals with a recorder to save the results.
+You can create an eval by providing an evaluation function.
 
 ```python
-from tatara.evals.eval import Eval
-from tatara.recorder import FileRecorder
+def is_cyberpunk_check(record: Record) -> bool:
+    prompt = "Check that the following text is an example of cyberpunk fiction: \n\n {}\n\n If it is cyberpunk, write <CYBERPUNK>. If it is not, write <NOT_CYBERPUNK>.".format(record['output'])
+    response = openai_client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model=model_name,
+        temperature=temperature,
+        frequency_penalty=freq_penalty,
+        max_tokens=max_tokens,
 
+    )
+    ret = response.choices[0].message.content
+    if "<CYBERPUNK>" in ret:
+        return True
+    elif "<NOT_CYBERPUNK>" in ret:
+        return False
+    else:
+        return is_cyberpunk_check(record)
 
-class FakeCreativityCheck(Eval):
-    name: str = "creativity_check"
-    description: str = "score the creativity of a sample as 0.5"
-
-    def eval_record(self, record: dict) -> float:
-        return 0.5
-
-
+  cyberpunk_check = Eval(
+        name = "is_cyberpunk_check",
+        description = "Checks whether the text is cyberpunk fiction. If it is, it returns True. If it is not, it returns False. If it is unsure, it will call itself again.",
+        eval_fn = is_cyberpunk_check,
+    )
 ```
 
-Let's walk through what's happening. First, we implement `eval_record`, which contains the logic that scores the sample. In this case, we're just returning a constant value of 0.5. Then, we run the eval with a recorder, which saves the results to a file.
+Let's walk through what's happening. First, we implement a function called `is_cyberpunk_check`, which checks whether the output of a model call -- `record['output']` contains cyberpunk content.
 
 ## Running the Eval
 
-Now we can run the eval with
+To run the eval over a dataset, you can use `run_evals`, which takes a list of evals and a [dataset](/concepts/datasets) name.
 
 ```python
-fcc = FakeCreativityCheck.run(FileRecorder("creativity_check_results.json"))
+    my_evals = [cyberpunk_check, creativity_score_eval]
+    run_evals(my_evals, ds_name)
 ```
 
-This will save the results to a file called `creativity_check_results.json`.
+<Info>
+  {" "}
+  The dataset will need to be created before running the evals. You can do this using
+  the `init_dataset` function, which you can import with `from tatara.datasets import
+  init_dataset`
+</Info>
 
-To save the results to Tatara you'll want to use the `TataraRecorder` instead.
+## Viewing the Results
 
-```python
-from tatara.evals.recorder import TataraRecorder
-```
+Once `run_evals` is done running, you'll be able to view the results in the [Tatara UI](https://app.tatara.ai/evaluations).
+
+<img height="800" src="/images/eval_run_with_arrow.png" />
