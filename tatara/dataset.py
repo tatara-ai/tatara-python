@@ -1,6 +1,5 @@
 import logging
 from typing import Optional, Dict, List, Any
-from tatara.evals.id_generator import IdGenerator
 from dataclasses import dataclass
 from requests.models import Response
 from requests.exceptions import HTTPError
@@ -38,10 +37,13 @@ class Dataset:
                 return False
         return True
 
-    def insert(self, records: List[Dict[str, Any]]) -> Optional[Dict]:
+    def insert(self, records: List[Dict[str, Any]] | Dict[str, Any]) -> Optional[Dict]:
         """
         Insert a record to a dataset that consists of input, output, and metadata
         """
+        if isinstance(records, dict):
+            records = [records]
+
         for record in records:
             if not self._is_valid_record(record):
                 logging.warning(
@@ -56,20 +58,17 @@ class Dataset:
             # Add the records to the current dataset
             self.records.extend(records_with_ids)
 
-    def attach_records(self, record_ids: List[str]) -> None:
-        # attach records to a dataset that already exist
-        IdGenerator.validate_record_ids(record_ids)
-        resp = _get_network_client().send_attach_records_post_request(
-            dataset_name=self.name, record_ids=record_ids
+    def attach(self, span_ids: List[str] | str) -> None:
+        if isinstance(span_ids, str):
+            span_ids = [span_ids]
+        # attach spans to a dataset that already exist
+        resp = _get_network_client().send_attach_spans_post_request(
+            dataset_name=self.name, span_ids=span_ids
         )
         if resp and resp.ok:
             # Add the records to the current dataset
             records = resp.json()
             self.records.extend(records)
-
-    def attach_record(self, record_id: str) -> None:
-        # attach a record to a dataset that already exists
-        self.attach_records([record_id])
     
 
 def init_dataset(name: str) -> Dataset:
