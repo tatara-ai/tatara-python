@@ -45,6 +45,15 @@ class TataraNetworkClient:
             f"{self.endpoints.dataset_endpoint}/{dataset_name}/insert_records",
             data=json.dumps(data),
         )
+    def send_attach_spans_post_request(
+        self, dataset_name: str, span_ids: List[str]
+    ) -> Optional[Response]:
+        data = {"span_ids": span_ids, "project": self.project}
+
+        return self.send_post_request(
+            f"{self.endpoints.dataset_endpoint}/{dataset_name}/attach_spans",
+            data=json.dumps(data),
+        )
 
     def send_attach_records_post_request(
         self, dataset_name: str, record_ids: List[str]
