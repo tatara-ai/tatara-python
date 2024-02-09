@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from typing import Optional, Dict
-from .provider_enum import ProviderEnum
 from enum import Enum
 
 
@@ -30,7 +29,7 @@ class LLMParams:
     max_tokens: Optional[int] = None
     temperature: Optional[float] = None
     model: Optional[str] = None
-    provider: Optional[str | ProviderEnum] = None
+    provider: Optional[str] = None
 
 
 @dataclass
@@ -46,7 +45,7 @@ class DiffusionParams:
     height: Optional[int] = None
     width: Optional[int] = None
     model: Optional[str] = None
-    provider: Optional[str | ProviderEnum] = None
+    provider: Optional[str] = None
 
 
 class LogType(Enum):
