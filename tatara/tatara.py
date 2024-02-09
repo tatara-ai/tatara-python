@@ -7,7 +7,15 @@ from .tatara_logging.span import Span
 from .tatara_logging.empty_span import _EmptySpan
 from .tatara_logging.empty_trace import _EmptyTrace
 from .tatara_logging.rating import Rating
-from .tatara_types import DiffusionPrompt, DiffusionParams, LogType, ImageFormat, LLMPrompt, LLMParams, LLMUsageMetrics
+from .tatara_types import (
+    DiffusionPrompt,
+    DiffusionParams,
+    LogType,
+    ImageFormat,
+    LLMPrompt,
+    LLMParams,
+    LLMUsageMetrics,
+)
 from .tatara_logging.utils import _gen_id_from_trace_and_event
 from .tatara_logging._record_keys import (
     LOG_RECORD_KEY_ID,
@@ -27,6 +35,8 @@ from .tatara_logging._record_keys import (
     LOG_RECORD_PROPERTIES_KEY_START_TIME,
     LOG_RECORD_PROPERTIES_KEY_LLM_EVENT,
     LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT,
+    LOG_RECORD_PROPERTIES_KEY_MODEL,
+    LOG_RECORD_PROPERTIES_KEY_PROVIDER,
     LOG_RECORD_KEY_METADATA,
 )
 
@@ -45,7 +55,14 @@ DEFAULT_FLUSH_INTERVAL = 60.0
 
 _tatara_client_state: Optional[TataraClientState] = None
 
-def init(project: str, queue_size: int = DEFAULT_QUEUE_SIZE, flush_interval: float = DEFAULT_FLUSH_INTERVAL, api_key: Optional[str] = None, is_dev: Optional[bool] = False):
+
+def init(
+    project: str,
+    queue_size: int = DEFAULT_QUEUE_SIZE,
+    flush_interval: float = DEFAULT_FLUSH_INTERVAL,
+    api_key: Optional[str] = None,
+    is_dev: Optional[bool] = False,
+):
     if api_key is None:
         if os.environ.get("TATARA_API_KEY") is not None:
             api_key = os.environ.get("TATARA_API_KEY")
@@ -55,8 +72,8 @@ def init(project: str, queue_size: int = DEFAULT_QUEUE_SIZE, flush_interval: flo
     global _tatara_client_state
     _tatara_client_state = TataraClientState(
         project,
-        queue_size = queue_size,
-        flush_interval = flush_interval,
+        queue_size=queue_size,
+        flush_interval=flush_interval,
         api_key=api_key,
         is_dev=is_dev if is_dev is not None else False,
     )
@@ -138,7 +155,13 @@ def log_diffusion_input(
             LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT: {
                 "prompt": prompt,
                 "params": params,
-            }
+            },
+            LOG_RECORD_PROPERTIES_KEY_MODEL: params.model
+            if params is not None
+            else None,
+            LOG_RECORD_PROPERTIES_KEY_PROVIDER: params.provider
+            if params is not None
+            else None,
         },
     }
     return _get_client_state().bglq_logger.log(log)
@@ -292,6 +315,7 @@ def _create_span_decorator(event: Optional[str], parent_event: Optional[str] = N
 
     return wrapper
 
+
 def _get_client_state() -> TataraClientState:
     if _tatara_client_state is None:
         raise Exception(
@@ -307,7 +331,9 @@ def _get_network_client() -> TataraNetworkClient:
         )
     return _tatara_client_state.tatara_network_client
 
+
 ### IMPLEMENTATION
+
 
 class _TraceImpl(Trace):
     def __init__(
@@ -441,8 +467,6 @@ class _TraceImpl(Trace):
         self.end()
 
 
-
-
 class _SpanImpl(Span):
     def __init__(
         self,
@@ -525,6 +549,12 @@ class _SpanImpl(Span):
         }
 
         self._properties[LOG_RECORD_PROPERTIES_KEY_LLM_EVENT] = llm_event
+        self._properties[LOG_RECORD_PROPERTIES_KEY_MODEL] = (
+            params.model if params is not None else None
+        )
+        self._properties[LOG_RECORD_PROPERTIES_KEY_PROVIDER] = (
+            params.provider if params is not None else None
+        )
         self._log_record[LOG_RECORD_KEY_PROPERTIES] = self._properties
         self._log()
 
@@ -539,6 +569,12 @@ class _SpanImpl(Span):
         }
 
         self._properties[LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT] = diffusion_event
+        self._properties[LOG_RECORD_PROPERTIES_KEY_MODEL] = (
+            params.model if params is not None else None
+        )
+        self._properties[LOG_RECORD_PROPERTIES_KEY_PROVIDER] = (
+            params.provider if params is not None else None
+        )
         self._log_record[LOG_RECORD_KEY_PROPERTIES] = self._properties
         self._log()
 
@@ -557,6 +593,12 @@ class _SpanImpl(Span):
         }
 
         self._properties[LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT] = diffusion_event
+        self._properties[LOG_RECORD_PROPERTIES_KEY_MODEL] = (
+            params.model if params is not None else None
+        )
+        self._properties[LOG_RECORD_PROPERTIES_KEY_PROVIDER] = (
+            params.provider if params is not None else None
+        )
         self._log_record[LOG_RECORD_KEY_PROPERTIES] = self._properties
         self._log()
 
@@ -577,6 +619,12 @@ class _SpanImpl(Span):
         }
 
         self._properties[LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT] = diffusion_event
+        self._properties[LOG_RECORD_PROPERTIES_KEY_MODEL] = (
+            params.model if params is not None else None
+        )
+        self._properties[LOG_RECORD_PROPERTIES_KEY_PROVIDER] = (
+            params.provider if params is not None else None
+        )
         self._log_record[LOG_RECORD_KEY_PROPERTIES] = self._properties
         self._log()
 
@@ -625,4 +673,3 @@ class _SpanImpl(Span):
         del exc_type, exc_value, traceback
 
         self.end()
-
