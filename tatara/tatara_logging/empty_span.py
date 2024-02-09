@@ -1,6 +1,5 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal, Optional, Union
 from tatara.tatara_types import (
-    ImageFormat,
     DiffusionParams,
     DiffusionPrompt,
     LLMPrompt,
@@ -54,7 +53,7 @@ class _EmptySpan(Span):
     def log_diffusion_success_with_image_data(
         self,
         image_data: str,
-        image_format: ImageFormat,
+        image_format: Union[str, Literal["png", "jpg"]],
         prompt: DiffusionPrompt | str,
         params: Optional[DiffusionParams] = None,
     ) -> None:

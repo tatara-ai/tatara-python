@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal, Optional, Union
 
 from tatara.tatara_types import (
     DiffusionParams,
@@ -7,7 +7,6 @@ from tatara.tatara_types import (
     LLMPrompt,
     LLMParams,
     LLMUsageMetrics,
-    ImageFormat,
 )
 from .rating import Rating
 
@@ -63,7 +62,7 @@ class Span(ABC):
     def log_diffusion_success_with_image_data(
         self,
         image_data: str,
-        image_format: ImageFormat,
+        image_format: Union[str, Literal["png", "jpeg"]],
         prompt: DiffusionPrompt | str,
         params: Optional[DiffusionParams] = None,
     ) -> None:
