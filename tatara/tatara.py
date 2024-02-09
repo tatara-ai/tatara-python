@@ -2,6 +2,7 @@ from inspect import iscoroutinefunction
 from typing import Optional, List, Dict, Any, Union, Literal
 import wrapt
 import logging
+from typing import Literal
 from .tatara_logging.trace import Trace
 from .tatara_logging.span import Span
 from .tatara_logging.empty_span import _EmptySpan
@@ -610,14 +611,17 @@ class _SpanImpl(Span):
         image_format: Union[str, Literal["png", "jpg"]],
         prompt: str | DiffusionPrompt,
         params: Optional[DiffusionParams] = None,
+        image_url_type: Literal["ephemeral", "permalink", "permalink_copy"] = "ephemeral",
     ):
         self._check_finished()
+
 
         diffusion_event = {
             "image_data": image_data,
             "image_format": image_format,
             "prompt": prompt,
             "params": params,
+            "image_url_type": image_url_type,
         }
 
         self._properties[LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT] = diffusion_event
