@@ -2,7 +2,6 @@ from inspect import iscoroutinefunction
 from typing import Optional, List, Dict, Any, Union, Literal
 import wrapt
 import logging
-from typing import Literal
 from .tatara_logging.trace import Trace
 from .tatara_logging.span import Span
 from .tatara_logging.empty_span import _EmptySpan
