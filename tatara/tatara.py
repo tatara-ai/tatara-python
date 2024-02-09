@@ -1,5 +1,5 @@
 from inspect import iscoroutinefunction
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union, Literal
 import wrapt
 import logging
 from .tatara_logging.trace import Trace
@@ -11,7 +11,6 @@ from .tatara_types import (
     DiffusionPrompt,
     DiffusionParams,
     LogType,
-    ImageFormat,
     LLMPrompt,
     LLMParams,
     LLMUsageMetrics,
@@ -168,7 +167,10 @@ def log_diffusion_input(
 
 
 def log_diffusion_output_with_image_data(
-    trace_id: str, event: str, image_data: str, image_format: ImageFormat
+    trace_id: str,
+    event: str,
+    image_data: str,
+    image_format: Union[str, Literal["png", "jpg"]],
 ):
     pass
 
@@ -190,7 +192,7 @@ def log_diffusion_output_with_image_url(image_url: str, trace_id: str, event: st
 
 def log_diffusion_call_with_image_data(
     image_data: str,
-    image_format: ImageFormat,
+    image_format: Union[str, Literal["png", "jpg"]],
     trace_id: str,
     event: str,
     prompt: DiffusionPrompt | str,
@@ -605,7 +607,7 @@ class _SpanImpl(Span):
     def log_diffusion_success_with_image_data(
         self,
         image_data: str,
-        image_format: ImageFormat,
+        image_format: Union[str, Literal["png", "jpg"]],
         prompt: str | DiffusionPrompt,
         params: Optional[DiffusionParams] = None,
     ):

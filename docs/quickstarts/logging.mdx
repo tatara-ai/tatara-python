@@ -33,10 +33,8 @@ First, we'll make our LLM call to generate a visual description of the character
 
 ```python
 from openai import OpenAI
-from tatara.tatara_types import ImageFormat
 from tatara.tatara_types import LLMParams
 import requests
-from tatara.provider_enum import ProviderEnum
 from tatara.tatara_types import LLMUsageMetrics
 
 MODEL_NAME = "gpt-3.5-turbo-1106"
@@ -87,7 +85,7 @@ def generate_character_image(character_visual_description: str, openai_client: O
     )
     image_url = response.data[0].url
     img_data = bytes(requests.get(image_url).content)
-    tatara.current_span().log_diffusion_success_with_image_data(img_data, ImageFormat.PNG, prompt=character_visual_description)
+    tatara.current_span().log_diffusion_success_with_image_data(img_data, "png", prompt=character_visual_description)
     return img_data
 ```
 
