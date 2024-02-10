@@ -41,3 +41,50 @@ with tatara.start_span(event="generate_image", parent_event="generate_visual_des
 
 A parent call in this case, is a model call that your call depends on. For example, your diffusion model might depend on an LLM call.
 In this case, the LLM call's span would be the parent of the diffusion call's span.
+
+## Logging images
+
+You can log images by providing a url for the image. For example, you can log with this:
+
+```python
+    def log_diffusion_success_with_image_url(
+        self,
+        image_url: str,
+        prompt: str | DiffusionPrompt,
+        params: Optional[DiffusionParams] = None,
+        image_url_type: Literal["ephemeral", "permalink", "permalink_copy"] = "ephemeral",
+    ):
+```
+
+You can also log images by providing the image data and the image format. For example,
+
+```python
+    def log_diffusion_success_with_image_data(
+        self,
+        image_data: str,
+        image_format: Union[str, Literal["png", "jpg"]],
+        prompt: str | DiffusionPrompt,
+        params: Optional[DiffusionParams] = None
+    ):
+```
+
+However this is not recommended as it will increase the size of the logs and put more memory pressure on your server. Whenever possible,
+use the `log_diffusion_success_with_image_url` function.
+
+### Logging async image generation
+
+If the image url isn't available at the time of generation, you can use the `log_diffusion_input` and `log_diffusion_output_with_image_url` functions to log the input and output of the diffusion model.
+
+```python
+log_diffusion_input(
+    trace_id: str,
+    event: str,
+    prompt: DiffusionPrompt | str,
+    params: Optional[DiffusionParams] = None,
+)
+```
+
+```python
+
+log_diffusion_output_with_image_url(image_url: str, trace_id: str, event: str)
+```
