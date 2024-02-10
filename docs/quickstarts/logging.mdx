@@ -108,6 +108,20 @@ if __name__ == "__main__":
             character_image = generate_character_image(character_visual_description, openai_client)
 ```
 
+## Other ways to log
+
+You can create a span by decorating a function like this where `your_event` is the name of the event you want to log.
+
+```python
+    @log_span(event='your_event')
+    def decorated_function():
+        # do stuff
+```
+
+## Passing tracking information
+
+Note that you can also pass in a `user_id` and an `id_` to the `start_trace` function to associate the trace with your user and to give the trace a unique identifier that you can use to join it to other data.
+
 ## Viewing your logs
 
 Now head over to the [Tatara dashboard](https://app.tatara.ai) to view your logs.
