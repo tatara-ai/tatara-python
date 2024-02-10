@@ -1,5 +1,5 @@
 ---
-title: "Logging Quickstart"
+title: "Trace Logging Quickstart"
 ---
 
 ### Prerequisites
@@ -7,35 +7,31 @@ title: "Logging Quickstart"
 Before you start, you'll need to install Tatara. If you haven't yet, you can get set up by following the instructions in the [installation guide](/setup).
 
 ### Initializing the client
+Begin by initializing the client with your project name. Initialization should trigger as soon as possible in your application's lifecycle.
 
-Begin by initializing the client with your project name. The project name tells Tatara which project to log to.
 
 ```python
 from tatara import tatara
-# By default, logs flush when:
-# * 60 seconds are up
-# * the max queue size is hit (1000 by default)
-# Here, we set the queue size to 1 and the flush interval to 1 second
-# so we can see the logs immediately.
-tatara.init(project="my test project", queue_size=1, flush_interval=1)
+
+tatara.init(project="my_project")
 ```
 
-### Understanding Traces and Spans
+### Understanding Trace Logging
+Trace logging enables debugging of chained AI model calls or a single model call.
 
-Tatara has a concept of a [trace](/concepts#traces), which is a collection of [spans](/concepts#span). A trace is a logical unit of work that can be used to group spans together.
+Tracing has a concept of a [trace](/concepts#traces), which is a collection of [spans](/concepts#span). A trace is a logical unit of work that can be used to group spans together.
 Because all of our spans are model calls, you can think of a trace as a "chain" of model calls.
 
-Let's walk through an example of generating a character image. This entire process will be a Trace and each model call will be a span within it.
 
-## Generating a character image
+## Example: Generating a character image
+Let's walk through an example of generating a character image. This entire process will be a Trace and each model call will be a span within it.
 
 First, we'll make our LLM call to generate a visual description of the character. Then, we'll use the visual description to generate an image of the character using a Diffusion model.
 
 ```python
 from openai import OpenAI
-from tatara.tatara_types import LLMParams
+from tatara import tatara
 import requests
-from tatara.tatara_types import LLMUsageMetrics
 
 MODEL_NAME = "gpt-3.5-turbo-1106"
 FREQ_PENALTY = 0.1
@@ -62,7 +58,7 @@ def generate_visual_description(character_description: str, openai_client: OpenA
                 max_tokens=MAX_TOKENS,
                 provider="openai",
             ),
-            usage_metrics=LLMUsageMetrics.from_oai_completion_usage(
+            usage_metrics=tatara.LLMUsageMetrics.from_oai_completion_usage(
                 response.usage
             ))
 
@@ -93,7 +89,7 @@ Let's put it all together. We'll initialize our client, and wrap our model calls
 
 ```python
 if __name__ == "__main__":
-    tatara.init(project="test_project", flush_interval=1, queue_size=1)
+    tatara.init(project="my_project", flush_interval=1, queue_size=1)
     openai_client = OpenAI()
 
 
@@ -115,7 +111,7 @@ Now if you run the above code, you should see the logs in the Tatara dashboard.
 You can create a span by decorating a function like this where `your_event` is the name of the event you want to log.
 
 ```python
-    @log_span(event='your_event')
+    @log_span(event="your_event")
     def decorated_function():
         # do stuff
 ```
