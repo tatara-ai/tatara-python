@@ -55,6 +55,7 @@ class Span(ABC):
         image_url: str,
         prompt: DiffusionPrompt | str,
         params: Optional[DiffusionParams] = None,
+        image_url_type: Literal["ephemeral", "permalink", "permalink_copy"] = "ephemeral",
     ) -> None:
         """Log a diffusion model image creation event. Only one llm/diffusion call allowed per span."""
 

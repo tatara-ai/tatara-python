@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tatara"
-version = "0.2.1"
+version = "0.2.3"
 description = ""
 authors = ["Tatara <support@tatara.ai>"]
 readme = "README.md"

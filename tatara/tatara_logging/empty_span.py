@@ -47,6 +47,7 @@ class _EmptySpan(Span):
         image_url: str,
         prompt: DiffusionPrompt | str,
         params: Optional[DiffusionParams] = None,
+        image_url_type: Literal["ephemeral", "permalink", "permalink_copy"] = "ephemeral",
     ) -> None:
         pass
 

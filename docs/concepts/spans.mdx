@@ -19,7 +19,6 @@ with tatara.start_span(event="generate_visual_description"):
 Once the span has started, you can use it to log the LLM output
 
 ```python
-
 tatara.current_span().log_llm_success(prompt=character_description, output=ret,
                 params=LLMParams(
                 model=model_name,
