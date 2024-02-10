@@ -7,9 +7,9 @@
   },
   "modeToggle": {
     "default": "light",
-    "isHidden": true
+    "isHidden": false
   },
-  "favicon": "/favicon.svg",
+  "favicon": "./favicon.svg",
   "colors": {
     "primary": "#FE6827",
     "light": "#FE7F48",
@@ -27,7 +27,7 @@
   ],
   "topbarCtaButton": {
     "name": "Dashboard",
-    "url": "https://app.tatara.com"
+    "url": "https://app.tatara.ai"
   },
 
 
