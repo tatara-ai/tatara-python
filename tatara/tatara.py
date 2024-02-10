@@ -585,6 +585,7 @@ class _SpanImpl(Span):
         image_url: str,
         prompt: str | DiffusionPrompt,
         params: Optional[DiffusionParams] = None,
+        image_url_type: Literal["ephemeral", "permalink", "permalink_copy"] = "ephemeral",
     ):
         self._check_finished()
 
@@ -592,6 +593,7 @@ class _SpanImpl(Span):
             "prompt": prompt,
             "image_url": image_url,
             "params": params,
+            "image_url_type": image_url_type,
         }
 
         self._properties[LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT] = diffusion_event
@@ -609,8 +611,7 @@ class _SpanImpl(Span):
         image_data: str,
         image_format: Union[str, Literal["png", "jpg"]],
         prompt: str | DiffusionPrompt,
-        params: Optional[DiffusionParams] = None,
-        image_url_type: Literal["ephemeral", "permalink", "permalink_copy"] = "ephemeral",
+        params: Optional[DiffusionParams] = None
     ):
         self._check_finished()
 
@@ -620,7 +621,6 @@ class _SpanImpl(Span):
             "image_format": image_format,
             "prompt": prompt,
             "params": params,
-            "image_url_type": image_url_type,
         }
 
         self._properties[LOG_RECORD_PROPERTIES_KEY_DIFFUSION_EVENT] = diffusion_event
